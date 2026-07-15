@@ -27,8 +27,10 @@ what remains unproven?
 ## 起始文件
 
 - [哲學／工程契約](docs/philosophy/engineering-contract.md)：重要改動、權限、撤回、風險與完成聲稱的共同規則。
+- [可觀測性與證據邊界](docs/contracts/observability-and-evidence-boundary.md)：哪些東西可被檢查，哪些仍必須誠實稱為不透明。
 - [公開邊界](PUBLIC_BOUNDARY.md)：什麼可以進公開倉庫，什麼必須留在受限環境。
 - [研究邊界：可問責的認識論行為](docs/research/behavioral-honesty-research-boundary.md)：若要研究「誠實相關行為」，什麼才是可測的問題。
+- [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
 - [任務板](task.md)：目前已接受的工作與尚待擁有者決定的事項。
 
 ## 最小模型

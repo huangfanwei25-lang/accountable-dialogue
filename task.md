@@ -44,3 +44,30 @@ Verification evidence (2026-07-15): all local Markdown links resolve; no Markdow
 trailing whitespace or legacy system labels remain in the initial public files.
 There is intentionally no runtime code, build, lint, test suite, dataset, or
 deployment claim in this foundation commit.
+
+---
+
+## Active Short Board: Public Surface Intake (2026-07-15)
+
+> Owner asked to organize what, if anything, should follow the clean public
+> foundation. This board is a curation boundary, not authorization to bulk-copy
+> a legacy repository.
+
+## Phase 1: Classify legacy material
+
+- [x] Identify that no legacy accountability document or schema is safe to copy unchanged.
+- [x] Separate rewriteable concepts from private, historical, generated, or domain-coupled artifacts.
+- [x] Record the classification in `docs/plans/public-surface-intake-v0.md`.
+**Success criteria**: old public availability is not mistaken for semantic or privacy portability.
+
+## Phase 2: Preserve only generic public contracts
+
+- [x] Add a rewritten observability/evidence boundary without runtime-specific claims.
+- [x] Link the new contract from the public README.
+**Success criteria**: readers can distinguish shell evidence, partial observability, opacity, authority, and verification without learning the old system's ontology.
+
+## Phase 3: Await a bounded first implementation decision
+
+- [ ] Owner ratifies, narrows, or rejects the proposed contract vocabulary.
+- [ ] Owner decides whether `change-record-v0` is the first public code slice.
+**Success criteria**: no schema, examples, validator, dataset, or runtime is described as accepted before the owner chooses its boundary.
