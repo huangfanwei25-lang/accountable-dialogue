@@ -48,6 +48,12 @@ Artifact 是可定位且帶版本或 digest 的文件、程式、Schema、測試
 `superseded` 事件必須同時指向 `previous_subject_id` 與 `successor_subject_id`。舊
 subject 保留原文；新的 subject 才承載修正後的內容。
 
+v0 不是「最後一筆覆寫前一筆」的容器。每個 subject 必須恰有一筆
+`subject_created`，且任何後續事件都必須在它建立後才可引用它；
+`review_requested` 必須先於唯一的 `governance_decided`；`withdrawn`、
+`superseded` 與 `archived` 是互斥的終止事件。若真實情況需要重開、封存後再處置，
+必須以未來明確的事件模型擴充，而非讓 v0 projection 無聲選取最後一筆。
+
 治理定案也是 Event。它有 `decision.outcome`、`decision.made_by` 與
 `decision.authority_basis`：
 
@@ -57,6 +63,10 @@ subject 保留原文；新的 subject 才承載修正後的內容。
 
 v0 只允許 human owner 或 explicit delegate 作出 `ratified`／`rejected` 的治理決定。
 代理可提出、記錄、驗證或附上證據，但不能藉由格式自行定案。
+
+`authority_basis` 在 v0 是可供後續人工核對的**宣告**，不是身份驗證、簽章或委派服務。
+validator 只限制其公開格式與角色組合；它不會也不能自行證明真實的人身、範圍或委派仍
+然有效。
 
 ### 4. Projection：唯讀的目前描述
 
@@ -76,6 +86,7 @@ Schema 的輸入不含 `governance_status`、`engineering_status`、`verificatio
 ## v0 的非目標
 
 - 不做資料庫、網路 API、登入、委派服務或存取控制；
+- 不把 `authority_basis` 的宣告誤稱為已驗證的身份或授權；
 - 不保存原始對話、hidden reasoning、prompt、token、email 或本機絕對路徑；
 - 不證明自由文字完全沒有個資；只拒絕已知敏感欄位與部分明顯格式；
 - 不把有權者的定案當成實作、品質或效果的證據；
@@ -89,7 +100,9 @@ Schema 的輸入不含 `governance_status`、`engineering_status`、`verificatio
 1. 在 subject 上直接寫 lifecycle 或 governance status；
 2. `authority.status` 或 agent 自行作出的治理定案；
 3. 不存在的參照、self-supersession 或沒有 successor 的替換事件；
-4. raw dialogue、hidden reasoning、prompt、token、email 或絕對本機路徑。
+4. 缺少或重複建立事件、錯誤治理順序，以及會造成最後寫入覆蓋的終止事件；
+5. raw dialogue、hidden reasoning、prompt、token、email、絕對本機路徑、路徑穿越或
+   file URI。
 
 相關文件：[哲學／工程契約](../philosophy/engineering-contract.md)、
 [公開邊界](../../PUBLIC_BOUNDARY.md)、[公開面遷移清單](../plans/public-surface-intake-v0.md)。

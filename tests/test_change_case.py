@@ -102,6 +102,57 @@ class ChangeCaseTests(unittest.TestCase):
         path_case["artifacts"][0]["locator"] = "C:\\Users\\person\\private.txt"
         self.assert_has_code(path_case, "private_value")
 
+    def test_rejects_histories_that_need_last_write_wins(self) -> None:
+        missing_creation = copy.deepcopy(load_case("proposal-ratification.json"))
+        missing_creation["events"] = missing_creation["events"][1:]
+        self.assert_has_code(missing_creation, "missing_subject_creation")
+        self.assert_has_code(missing_creation, "invalid_event_order")
+
+        no_review = copy.deepcopy(load_case("proposal-ratification.json"))
+        no_review["events"].pop(1)
+        self.assert_has_code(no_review, "invalid_governance_order")
+
+        conflicting_terminal = copy.deepcopy(load_case("verification-supersession.json"))
+        conflicting_terminal["events"].append(
+            {
+                "id": "event-claim-archived",
+                "kind": "archived",
+                "sequence": 5,
+                "recorded_at": "2026-07-15T10:20:00Z",
+                "recorded_by": {"kind": "human", "role": "repository_owner"},
+                "public_summary": "合成範例中封存已替換的 Claim。",
+                "subject_refs": ["claim-broad-v1"],
+            }
+        )
+        self.assert_has_code(conflicting_terminal, "terminal_subject_referenced")
+
+    def test_rejects_unsafe_public_locators_and_references(self) -> None:
+        locator_case = copy.deepcopy(load_case("proposal-ratification.json"))
+        locator_case["artifacts"][0]["locator"] = "../../.env"
+        self.assert_has_code(locator_case, "unsafe_locator")
+        schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+        self.assertTrue(list(Draft202012Validator(schema).iter_errors(locator_case)))
+
+        reference_case = copy.deepcopy(load_case("proposal-ratification.json"))
+        decision = reference_case["events"][2]["decision"]
+        decision["made_by"]["role"] = "authorized_delegate"
+        decision["authority_basis"] = {
+            "kind": "explicit_delegation",
+            "scope": ["public_schema_prototype"],
+            "reference": "file:///private/delegation.txt",
+        }
+        self.assert_has_code(reference_case, "unsafe_reference")
+
+        credential_case = copy.deepcopy(load_case("proposal-ratification.json"))
+        credential_case["artifacts"][0]["revision"] = "ghp_abcdefghijklmnopqrstuv"
+        self.assert_has_code(credential_case, "private_value")
+
+    def test_unknown_subject_projection_has_a_clear_error(self) -> None:
+        case = load_case("proposal-ratification.json")
+
+        with self.assertRaisesRegex(ValueError, "unknown subject"):
+            project_subject(case, "proposal-not-present")
+
 
 if __name__ == "__main__":
     unittest.main()

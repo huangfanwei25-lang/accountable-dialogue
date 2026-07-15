@@ -64,6 +64,28 @@
       "minLength": 1,
       "maxLength": 2000
     },
+    "public_locator": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "allOf": [
+        {
+          "not": {
+            "pattern": "^(?:[A-Za-z]:[\\\\/]|[\\\\/]{2}|/|~|file:)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)"
+          }
+        },
+        {
+          "not": {
+            "pattern": "[?@]"
+          }
+        }
+      ]
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time"
@@ -110,9 +132,7 @@
           "enum": ["document", "schema", "source_file", "test", "external_source"]
         },
         "locator": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 512
+          "$ref": "#/$defs/public_locator"
         },
         "revision": {
           "type": "string",
@@ -188,9 +208,7 @@
           }
         },
         "reference": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "$ref": "#/$defs/public_locator"
         }
       },
       "allOf": [

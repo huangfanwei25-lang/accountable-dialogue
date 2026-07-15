@@ -97,17 +97,24 @@ deployment claim in this foundation commit.
 
 - [x] Add a standard-library validator for local shape and cross-reference checks.
 - [x] Add a pure, read-only projection for a subject's recorded history.
+- [x] Reject missing or duplicate creation, invalid governance order, and terminal lifecycle conflicts rather than using last-write wins.
+- [x] Reject unsafe public locators, delegation references, and common credential-shaped values.
 **Success criteria**: validation and projection have no network, database, LLM, memory, or mutation dependency.
 
 ## Phase 4: Verify and publish accurately
 
-- [x] Run tests, lint, Markdown link checks, and staged-diff checks.
+- [x] Re-run tests, lint, Markdown link checks, and staged-diff checks after the pre-push correction.
 - [x] Update README with the exact prototype scope and known limits.
 **Success criteria**: the public claim matches the files, tests, and limits actually present.
 
-Verification evidence (2026-07-15): `python -m pytest tests/ -x` passed 6 tests;
-`python -m ruff check accountable_dialogue tests` passed; the public JSON Schema
-and both synthetic examples validated with Draft 2020-12; all local Markdown links
-resolve; no trailing whitespace or legacy labels remain; and `git diff --check`
-passed. The pytest run emitted 12 deprecation warnings from the pre-installed
-`pytest-freezegun` plugin, not from this repository's code.
+Initial verification (2026-07-15) passed 6 tests, lint, Schema and document checks. A
+pre-push review then found that the tested shape still allowed invalid event history and
+unsafe public locators. The local commit was not pushed. This board remains open until the
+new semantic and privacy regression tests, lint, Schema, document, and staged-diff checks
+have all been repeated.
+
+Final verification (2026-07-15): `python -m pytest tests/ -x` passed 9 tests;
+`python -m ruff check accountable_dialogue tests` passed; the public Schema and both
+synthetic cases validated with Draft 2020-12; all local Markdown links resolve; no trailing
+whitespace or legacy labels remain; and `git diff --check` passed. The pytest warnings came
+from the pre-installed `pytest-freezegun` plugin, not from this repository's code.

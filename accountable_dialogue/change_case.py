@@ -12,6 +12,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
+from urllib.parse import urlparse
 
 FORMAT = "accountable-dialogue/change-case-v0"
 
@@ -40,6 +41,7 @@ EVENT_KINDS = frozenset(
         "archived",
     }
 )
+TERMINAL_EVENT_KINDS = frozenset({"withdrawn", "superseded", "archived"})
 DECISION_OUTCOMES = frozenset({"ratified", "rejected"})
 IMPLEMENTATION_OUTCOMES = frozenset({"reported_partial", "reported_implemented"})
 VERIFICATION_OUTCOMES = frozenset(
@@ -116,7 +118,10 @@ ROLE_PATTERN = re.compile(r"^[a-z][a-z0-9_-]{1,63}$")
 PRIVATE_VALUE_PATTERNS = (
     re.compile(r"\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b"),
     re.compile(r"(?:^[A-Za-z]:[\\/]|^/(?:Users|home)/)"),
-    re.compile(r"\b(?:sk|ghp|github_pat)-[A-Za-z0-9_-]{8,}\b"),
+    re.compile(r"\bsk-[A-Za-z0-9_-]{16,}\b"),
+    re.compile(r"\bghp_[A-Za-z0-9]{20,}\b"),
+    re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
+    re.compile(r"\bAIza[0-9A-Za-z_-]{20,}\b"),
 )
 
 
@@ -199,7 +204,9 @@ def project_subject(case: Mapping[str, Any], subject_id: str) -> SubjectProjecti
         raise ValueError(f"cannot project an invalid change case: {rendered}")
 
     subjects = case["subjects"]
-    subject = next(item for item in subjects if item["id"] == subject_id)
+    subject = next((item for item in subjects if item["id"] == subject_id), None)
+    if subject is None:
+        raise ValueError(f"unknown subject id {subject_id!r}")
     governance = "no_governance_record"
     lifecycle = "no_terminal_event"
     implementation = "no_implementation_report"
@@ -288,7 +295,7 @@ def _validate_artifacts(
                 "invalid_artifact_kind",
                 f"artifact kind must be one of {sorted(ARTIFACT_KINDS)}",
             )
-        _validate_short_text(item.get("locator"), f"{path}.locator", issues, "locator")
+        _validate_public_locator(item.get("locator"), f"{path}.locator", issues)
         _validate_short_text(item.get("revision"), f"{path}.revision", issues, "revision")
     return identifiers
 
@@ -414,6 +421,128 @@ def _validate_events(
         elif kind == "superseded":
             _validate_supersession(item, path, subject_ids, issues)
 
+    _validate_event_history(items, subject_ids, issues)
+
+
+def _validate_event_history(
+    items: list[object], subject_ids: set[str], issues: list[ValidationIssue]
+) -> None:
+    """Reject histories whose meaning would otherwise depend on last-write wins."""
+
+    ordered_events = sorted(
+        (
+            (index, item)
+            for index, item in enumerate(items)
+            if isinstance(item, Mapping)
+            and isinstance(item.get("sequence"), int)
+            and not isinstance(item.get("sequence"), bool)
+            and item["sequence"] >= 1
+        ),
+        key=lambda pair: pair[1]["sequence"],
+    )
+    created_at: dict[str, int] = {}
+    reviewed: set[str] = set()
+    governance_decided: set[str] = set()
+    terminal_at: dict[str, str] = {}
+
+    for index, event in ordered_events:
+        path = f"$.events[{index}]"
+        kind = event.get("kind")
+        subject_refs = _event_subject_references(event, subject_ids)
+
+        if kind == "subject_created":
+            for subject_id in subject_refs:
+                if subject_id in created_at:
+                    _issue(
+                        issues,
+                        f"{path}.subject_refs",
+                        "duplicate_subject_creation",
+                        f"subject {subject_id!r} already has a subject_created event",
+                    )
+                else:
+                    created_at[subject_id] = event["sequence"]
+            continue
+
+        for subject_id in subject_refs:
+            if subject_id not in created_at:
+                _issue(
+                    issues,
+                    path,
+                    "invalid_event_order",
+                    f"subject {subject_id!r} must be created before it is referenced",
+                )
+            elif subject_id in terminal_at:
+                _issue(
+                    issues,
+                    path,
+                    "terminal_subject_referenced",
+                    f"subject {subject_id!r} already reached terminal event {terminal_at[subject_id]!r}",
+                )
+
+        if kind == "review_requested":
+            for subject_id in subject_refs:
+                if subject_id in governance_decided:
+                    _issue(
+                        issues,
+                        path,
+                        "invalid_governance_order",
+                        f"subject {subject_id!r} cannot be reviewed after a final governance decision",
+                    )
+                else:
+                    reviewed.add(subject_id)
+        elif kind == "governance_decided":
+            for subject_id in subject_refs:
+                if subject_id not in reviewed:
+                    _issue(
+                        issues,
+                        path,
+                        "invalid_governance_order",
+                        f"subject {subject_id!r} needs review_requested before governance_decided",
+                    )
+                if subject_id in governance_decided:
+                    _issue(
+                        issues,
+                        path,
+                        "duplicate_governance_decision",
+                        f"subject {subject_id!r} already has a final governance decision",
+                    )
+                governance_decided.add(subject_id)
+
+        if kind in TERMINAL_EVENT_KINDS:
+            terminal_subjects = (
+                [event.get("previous_subject_id")]
+                if kind == "superseded"
+                else event.get("subject_refs", [])
+            )
+            for subject_id in terminal_subjects:
+                if not isinstance(subject_id, str) or subject_id not in subject_ids:
+                    continue
+                if subject_id in terminal_at:
+                    _issue(
+                        issues,
+                        path,
+                        "conflicting_terminal_event",
+                        f"subject {subject_id!r} cannot receive another terminal lifecycle event",
+                    )
+                elif subject_id in created_at:
+                    terminal_at[subject_id] = kind
+
+    for subject_id in sorted(subject_ids - created_at.keys()):
+        _issue(
+            issues,
+            "$.subjects",
+            "missing_subject_creation",
+            f"subject {subject_id!r} needs exactly one subject_created event",
+        )
+
+
+def _event_subject_references(event: Mapping[str, Any], subject_ids: set[str]) -> list[str]:
+    if event.get("kind") == "superseded":
+        candidates = [event.get("previous_subject_id"), event.get("successor_subject_id")]
+    else:
+        candidates = event.get("subject_refs", [])
+    return [candidate for candidate in candidates if isinstance(candidate, str) and candidate in subject_ids]
+
 
 def _validate_global_ids(
     subjects: list[object] | None,
@@ -509,7 +638,7 @@ def _validate_authority_basis(value: object, path: str, issues: list[ValidationI
         )
     _validate_string_list(value.get("scope"), f"{path}.scope", issues, "scope", minimum=1)
     if "reference" in value:
-        _validate_short_text(value.get("reference"), f"{path}.reference", issues, "reference")
+        _validate_public_reference(value.get("reference"), f"{path}.reference", issues)
     if value.get("kind") == "explicit_delegation" and "reference" not in value:
         _issue(
             issues,
@@ -640,6 +769,50 @@ def _validate_summary(value: object, path: str, issues: list[ValidationIssue]) -
 def _validate_short_text(value: object, path: str, issues: list[ValidationIssue], label: str) -> None:
     if not isinstance(value, str) or not value.strip() or len(value) > 512:
         _issue(issues, path, "invalid_text", f"{label} must be non-empty and at most 512 characters")
+
+
+def _validate_public_locator(value: object, path: str, issues: list[ValidationIssue]) -> None:
+    _validate_short_text(value, path, issues, "locator")
+    if isinstance(value, str) and value.strip() and not _is_safe_public_locator(value):
+        _issue(
+            issues,
+            path,
+            "unsafe_locator",
+            "locator must be a repository-relative path or a query-free HTTPS URL",
+        )
+
+
+def _validate_public_reference(value: object, path: str, issues: list[ValidationIssue]) -> None:
+    _validate_short_text(value, path, issues, "reference")
+    if not isinstance(value, str) or not value.strip():
+        return
+    if ID_PATTERN.fullmatch(value) or _is_safe_public_locator(value):
+        return
+    _issue(
+        issues,
+        path,
+        "unsafe_reference",
+        "reference must be a public identifier, repository-relative path, or query-free HTTPS URL",
+    )
+
+
+def _is_safe_public_locator(value: str) -> bool:
+    """Accept only locations that are portable and do not smuggle local access data."""
+
+    if not value or len(value) > 512 or "@" in value or "?" in value:
+        return False
+    parsed = urlparse(value)
+    if parsed.scheme:
+        if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+            return False
+        return all(segment not in {"", ".", ".."} for segment in parsed.path.split("/") if segment)
+
+    if value.startswith(("/", "\\", "~")) or re.match(r"^[A-Za-z]:[\\/]", value):
+        return False
+    if "\\" in value or "#" in value:
+        return False
+    segments = value.split("/")
+    return all(segment not in {"", ".", ".."} for segment in segments)
 
 
 def _validate_string_list(
