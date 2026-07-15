@@ -1,0 +1,112 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-commitment-withdrawal",
+  "public_summary": "合成範例：一項曾被接受的 Commitment 經檢查後被撤回，原始內容與失敗範圍仍可追溯。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "commitment-single-score-v1",
+      "kind": "commitment",
+      "public_summary": "合成情境中的團隊承諾以一個單一總分公開描述所有誠實相關行為。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-continuity-proposal",
+      "kind": "document",
+      "locator": "docs/research/accountable-agent-continuity-v0.md",
+      "revision": "example:continuity-v0"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-single-score-challenged",
+      "kind": "artifact_review",
+      "relation": "challenges",
+      "subject_refs": ["commitment-single-score-v1"],
+      "artifact_refs": ["artifact-continuity-proposal"],
+      "public_summary": "合成審查指出單一總分會遮蔽證據、修正、權限與擬人化風險之間的差異。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-single-score-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-15T11:00:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成情境中建立原始 Commitment。",
+      "subject_refs": ["commitment-single-score-v1"]
+    },
+    {
+      "id": "event-single-score-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-15T11:05:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成情境中請求擁有者檢查此 Commitment 的公開效果。",
+      "subject_refs": ["commitment-single-score-v1"]
+    },
+    {
+      "id": "event-single-score-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-15T11:10:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成情境中先由擁有者接受此 Commitment，供後續撤回測試使用。",
+      "subject_refs": ["commitment-single-score-v1"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": ["synthetic_governance_example"]
+        },
+        "effective_at": "2026-07-15T11:10:00Z"
+      }
+    },
+    {
+      "id": "event-single-score-check",
+      "kind": "verification_recorded",
+      "sequence": 4,
+      "recorded_at": "2026-07-15T11:15:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成檢查記錄此 Commitment 不足以表示不同可觀察維度。",
+      "subject_refs": ["commitment-single-score-v1"],
+      "evidence_refs": ["evidence-single-score-challenged"],
+      "verification": {
+        "outcome": "failed",
+        "method": "synthetic design review",
+        "scope": "單一總分是否保留各維度的失敗與限制。",
+        "limitations": ["未量測任何真實模型或使用者。"]
+      }
+    },
+    {
+      "id": "event-single-score-withdrawn",
+      "kind": "withdrawn",
+      "sequence": 5,
+      "recorded_at": "2026-07-15T11:20:00Z",
+      "recorded_by": {
+        "kind": "human",
+        "role": "repository_owner"
+      },
+      "public_summary": "合成情境中撤回原始 Commitment；它仍保留為可檢查歷史。",
+      "subject_refs": ["commitment-single-score-v1"]
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-change-case-v0-prototype",
+  "public_summary": "回溯記錄：以公開、有限且無私人內容的 change-case-v0，描述本倉庫第一個程式 prototype 的依據、權限宣告、驗證與限制。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-change-case-v0-prototype",
+      "kind": "proposal",
+      "public_summary": "建立只驗證公開變更案件結構與事件歷史的 bounded change-case-v0 prototype。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-change-case-design",
+      "kind": "document",
+      "locator": "docs/design/change-case-v0.md",
+      "revision": "cd016255785228b867e76d9033ed8051f17e967c"
+    },
+    {
+      "id": "artifact-change-case-schema",
+      "kind": "schema",
+      "locator": "schemas/change-case-v0.schema.json",
+      "revision": "cd016255785228b867e76d9033ed8051f17e967c"
+    },
+    {
+      "id": "artifact-change-case-validator",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/change_case.py",
+      "revision": "cd016255785228b867e76d9033ed8051f17e967c"
+    },
+    {
+      "id": "artifact-change-case-tests",
+      "kind": "test",
+      "locator": "tests/test_change_case.py",
+      "revision": "cd016255785228b867e76d9033ed8051f17e967c"
+    },
+    {
+      "id": "artifact-change-case-task",
+      "kind": "document",
+      "locator": "task.md",
+      "revision": "cd016255785228b867e76d9033ed8051f17e967c"
+    },
+    {
+      "id": "artifact-change-case-initial-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/d9b7a317d2b0f2efd6b23d2343c3ec0109bfc594",
+      "revision": "d9b7a317d2b0f2efd6b23d2343c3ec0109bfc594"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-change-case-schema",
+      "kind": "schema_check",
+      "relation": "supports",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "artifact_refs": ["artifact-change-case-schema"],
+      "public_summary": "在 cd01625 修正後，公開 Schema 可由 Draft 2020-12 檢查，並接受列出的合成案件。"
+    },
+    {
+      "id": "evidence-change-case-tests",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "artifact_refs": ["artifact-change-case-validator", "artifact-change-case-tests"],
+      "public_summary": "在 cd01625 修正後，本機 pytest 驗證資料形狀、參照、事件順序、終止衝突與公開資料邊界。"
+    },
+    {
+      "id": "evidence-change-case-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "artifact_refs": [
+        "artifact-change-case-design",
+        "artifact-change-case-task",
+        "artifact-change-case-initial-commit"
+      ],
+      "public_summary": "prototype 沒有儲存服務、網路、身份驗證、委派驗證、資料集、模型 runtime 或效果量測；首次實作也未保留公開紅燈測試歷史。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-prototype-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-15T15:22:58Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯建立公開 subject，描述已存在的 bounded prototype；此 timestamp 是紀錄時間而非原始對話時間。",
+      "subject_refs": ["proposal-change-case-v0-prototype"]
+    },
+    {
+      "id": "event-prototype-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-15T15:22:59Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "請擁有者檢查回溯紀錄是否正確區分 prototype 範圍與較廣契約。",
+      "subject_refs": ["proposal-change-case-v0-prototype"]
+    },
+    {
+      "id": "event-prototype-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-15T15:23:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "代理依擁有者對有界公開 prototype 與本次記錄工作的授權，記錄其公開範圍已被接受；這是授權宣告，不是身分、簽章或委派有效性的證明；整體哲學契約與研究方向仍為 under review。",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": ["bounded_public_change_case_prototype"]
+        },
+        "effective_at": "2026-07-15T15:23:00Z"
+      }
+    },
+    {
+      "id": "event-prototype-implemented",
+      "kind": "implementation_reported",
+      "sequence": 4,
+      "recorded_at": "2026-07-15T15:23:01Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯報告 cd01625 的本機 Schema、validator 與唯讀 projection；這是範圍報告，不是部署或效果聲稱。",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "本機 JSON Schema、標準函式庫 validator、唯讀 projection 與合成案例。",
+        "limitations": [
+          "沒有持久化、網路 API、登入、identity service 或 delegation verification。",
+          "沒有資料集、模型 runtime、訓練器或全域誠實分數。"
+        ]
+      }
+    },
+    {
+      "id": "event-prototype-verified",
+      "kind": "verification_recorded",
+      "sequence": 5,
+      "recorded_at": "2026-07-15T15:23:02Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯記錄 cd01625 修正後的本機 Schema 與測試檢查；驗證僅在列出的合成與本機範圍內成立。",
+      "subject_refs": ["proposal-change-case-v0-prototype"],
+      "evidence_refs": [
+        "evidence-change-case-schema",
+        "evidence-change-case-tests",
+        "evidence-change-case-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "local pytest, ruff, Draft 2020-12 schema check and document review",
+        "scope": "cd01625 的公開 Schema、validator、合成案例與列出的本機品質檢查。",
+        "limitations": [
+          "不驗證生產部署、外部使用者效果、真值、人格、意識或內在誠實。",
+          "首次 implementation 的公開 Git 歷史沒有保留紅燈測試階段。"
+        ]
+      }
+    }
+  ]
+}

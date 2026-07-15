@@ -63,6 +63,18 @@ class ChangeCaseTests(unittest.TestCase):
         self.assertEqual("failed", original.verification)
         self.assertEqual("no_terminal_event", successor.lifecycle)
 
+    def test_withdrawal_preserves_a_commitment_subject_and_its_failed_check(self) -> None:
+        case = load_case("commitment-withdrawal.json")
+
+        self.assert_valid(case)
+        projection = project_subject(case, "commitment-single-score-v1")
+
+        self.assertEqual("commitment", case["subjects"][0]["kind"])
+        self.assertEqual("ratified", projection.governance)
+        self.assertEqual("withdrawn", projection.lifecycle)
+        self.assertEqual("failed", projection.verification)
+        self.assertEqual("event-single-score-check", projection.verification_event_id)
+
     def test_rejects_status_fields_or_a_change_as_a_subject_kind(self) -> None:
         status_case = copy.deepcopy(load_case("proposal-ratification.json"))
         status_case["subjects"][0]["governance_status"] = "ratified"
@@ -125,6 +137,104 @@ class ChangeCaseTests(unittest.TestCase):
             }
         )
         self.assert_has_code(conflicting_terminal, "terminal_subject_referenced")
+
+    def test_projection_identifies_the_latest_repeatable_report_without_erasing_history(self) -> None:
+        case = copy.deepcopy(load_case("proposal-ratification.json"))
+        case["evidence"].extend(
+            [
+                {
+                    "id": "evidence-proposal-first-check",
+                    "kind": "test_result",
+                    "relation": "limits",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "artifact_refs": ["artifact-contract-v0"],
+                    "public_summary": "第一份合成檢查只確認資料形狀。",
+                },
+                {
+                    "id": "evidence-proposal-second-check",
+                    "kind": "test_result",
+                    "relation": "supports",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "artifact_refs": ["artifact-contract-v0"],
+                    "public_summary": "第二份合成檢查確認列出的歷史規則。",
+                },
+            ]
+        )
+        case["events"].extend(
+            [
+                {
+                    "id": "event-proposal-first-implemented",
+                    "kind": "implementation_reported",
+                    "sequence": 4,
+                    "recorded_at": "2026-07-15T09:15:00Z",
+                    "recorded_by": {"kind": "agent", "role": "assistant"},
+                    "public_summary": "第一份合成實作報告為部分完成。",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "implementation": {
+                        "outcome": "reported_partial",
+                        "scope": "只建立了資料形狀。",
+                        "limitations": ["尚未加入事件順序檢查。"],
+                    },
+                },
+                {
+                    "id": "event-proposal-first-verified",
+                    "kind": "verification_recorded",
+                    "sequence": 5,
+                    "recorded_at": "2026-07-15T09:16:00Z",
+                    "recorded_by": {"kind": "agent", "role": "assistant"},
+                    "public_summary": "第一份合成驗證記錄為未定論。",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "evidence_refs": ["evidence-proposal-first-check"],
+                    "verification": {
+                        "outcome": "inconclusive",
+                        "method": "synthetic first pass",
+                        "scope": "只涵蓋結構形狀。",
+                        "limitations": ["未檢查事件順序。"],
+                    },
+                },
+                {
+                    "id": "event-proposal-second-implemented",
+                    "kind": "implementation_reported",
+                    "sequence": 6,
+                    "recorded_at": "2026-07-15T09:14:00Z",
+                    "recorded_by": {"kind": "agent", "role": "assistant"},
+                    "public_summary": "第二份合成實作報告為範圍內完成。",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "implementation": {
+                        "outcome": "reported_implemented",
+                        "scope": "加入列出的事件順序檢查。",
+                        "limitations": ["未提供儲存或網路服務。"],
+                    },
+                },
+                {
+                    "id": "event-proposal-second-verified",
+                    "kind": "verification_recorded",
+                    "sequence": 7,
+                    "recorded_at": "2026-07-15T09:10:00Z",
+                    "recorded_by": {"kind": "agent", "role": "assistant"},
+                    "public_summary": "第二份合成驗證記錄為範圍內通過。",
+                    "subject_refs": ["proposal-subject-event-model"],
+                    "evidence_refs": ["evidence-proposal-second-check"],
+                    "verification": {
+                        "outcome": "verified_within_scope",
+                        "method": "synthetic second pass",
+                        "scope": "涵蓋列出的結構與事件順序。",
+                        "limitations": ["未涵蓋未列出的工作負載。"],
+                    },
+                },
+            ]
+        )
+
+        self.assert_valid(case)
+        projection = project_subject(case, "proposal-subject-event-model")
+
+        self.assertLess(case["events"][-1]["recorded_at"], case["events"][-2]["recorded_at"])
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("event-proposal-second-implemented", projection.implementation_event_id)
+        self.assertEqual("verified_within_scope", projection.verification)
+        self.assertEqual("event-proposal-second-verified", projection.verification_event_id)
+        self.assertEqual(2, sum(event["kind"] == "implementation_reported" for event in case["events"]))
+        self.assertEqual(2, sum(event["kind"] == "verification_recorded" for event in case["events"]))
 
     def test_rejects_unsafe_public_locators_and_references(self) -> None:
         locator_case = copy.deepcopy(load_case("proposal-ratification.json"))

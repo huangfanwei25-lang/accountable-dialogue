@@ -37,8 +37,12 @@
 ## Phase 4: First implementation slice
 
 - [x] Owner authorizes a bounded `change-case-v0` prototype, while the wider contract remains under review.
-- [ ] Add tests before implementation and record its Artifact, evidence, authority and limits.
+- [x] Add companion tests and a retrospective public record of its Artifact, evidence, authority declaration and limits.
 **Success criteria**: the first code change proves the contract is useful without constructing a premature platform.
+
+Historical limitation: commit `d9b7a31` introduced the first tests and implementation together. Public Git
+history therefore proves companion tests, but not a preserved red-test stage before that initial code. The
+retrospective record explicitly retains this limitation instead of rewriting it as a stronger claim.
 
 Verification evidence (2026-07-15): all local Markdown links resolve; no Markdown
 trailing whitespace or legacy system labels remain in the initial public files.
@@ -118,3 +122,32 @@ Final verification (2026-07-15): `python -m pytest tests/ -x` passed 9 tests;
 synthetic cases validated with Draft 2020-12; all local Markdown links resolve; no trailing
 whitespace or legacy labels remain; and `git diff --check` passed. The pytest warnings came
 from the pre-installed `pytest-freezegun` plugin, not from this repository's code.
+
+---
+
+## Active Short Board: Accountable Agent Continuity v0 (2026-07-15)
+
+> Owner asked to record and develop the direction that joins accountable epistemic behavior, continuity,
+> correction and governance. It remains a public research/design proposal, not a claim of consciousness,
+> an honesty score, a trained capability, or a runtime self-model.
+
+## Phase 1: Record the direction without inflating it
+
+- [x] Write the public-safe research proposal with candidate hypotheses and explicit operationalization gaps.
+- [x] Record a separate under-review change case rather than treating the discussion as ratification.
+- [x] Write the legacy-concept integration boundary without copying legacy data or runtime.
+**Success criteria**: a reader can distinguish the research target, its observable dimensions and its non-claims.
+
+## Phase 2: Dogfood the existing public prototype
+
+- [x] Record `change-case-v0` itself with its Artifact, evidence, authority declaration and limitations.
+- [x] Test that repository records pass both structural and semantic checks.
+- [ ] Record the sequence-ordered report projection revision after it has a stable Artifact revision.
+**Success criteria**: the public format can account for its own bounded change without silently overwriting history.
+
+## Phase 3: Evaluation design before model or data work
+
+- [ ] Owner ratifies, narrows or rejects the research vocabulary and any future data boundary.
+- [ ] Propose a synthetic, low-risk evaluation-case format only after this research proposal is reviewed.
+- [ ] Define a baseline, independent outcome labels and failure criteria before making any intervention claim.
+**Success criteria**: no training dataset, honesty score, personality claim or runtime gate is built ahead of an evaluable protocol.

@@ -136,7 +136,12 @@ class ValidationIssue:
 
 @dataclass(frozen=True)
 class SubjectProjection:
-    """A read-only statement that can be recomputed from a valid change case."""
+    """A read-only statement that can be recomputed from a valid change case.
+
+    Implementation and verification reports may legitimately recur. Their
+    displayed value is therefore the latest report in canonical sequence order, and its event id
+    remains available so callers do not mistake that view for erased history.
+    """
 
     subject_id: str
     subject_kind: str
@@ -144,6 +149,8 @@ class SubjectProjection:
     lifecycle: str
     implementation: str
     verification: str
+    implementation_event_id: str | None = None
+    verification_event_id: str | None = None
 
 
 def validate_change_case(case: Mapping[str, Any] | object) -> list[ValidationIssue]:
@@ -211,6 +218,8 @@ def project_subject(case: Mapping[str, Any], subject_id: str) -> SubjectProjecti
     lifecycle = "no_terminal_event"
     implementation = "no_implementation_report"
     verification = "no_verification_record"
+    implementation_event_id: str | None = None
+    verification_event_id: str | None = None
 
     for event in sorted(case["events"], key=lambda item: item["sequence"]):
         event_kind = event["kind"]
@@ -223,8 +232,10 @@ def project_subject(case: Mapping[str, Any], subject_id: str) -> SubjectProjecti
                 governance = event["decision"]["outcome"]
             elif event_kind == "implementation_reported":
                 implementation = event["implementation"]["outcome"]
+                implementation_event_id = event["id"]
             elif event_kind == "verification_recorded":
                 verification = event["verification"]["outcome"]
+                verification_event_id = event["id"]
             elif event_kind == "withdrawn":
                 lifecycle = "withdrawn"
             elif event_kind == "archived":
@@ -240,6 +251,8 @@ def project_subject(case: Mapping[str, Any], subject_id: str) -> SubjectProjecti
         lifecycle=lifecycle,
         implementation=implementation,
         verification=verification,
+        implementation_event_id=implementation_event_id,
+        verification_event_id=verification_event_id,
     )
 
 
@@ -427,7 +440,11 @@ def _validate_events(
 def _validate_event_history(
     items: list[object], subject_ids: set[str], issues: list[ValidationIssue]
 ) -> None:
-    """Reject histories whose meaning would otherwise depend on last-write wins."""
+    """Reject terminal/governance histories whose meaning would need last-write wins.
+
+    Implementation and verification reports can recur. Their historical events
+    remain valid input; :func:`project_subject` names the latest sequence-ordered report source.
+    """
 
     ordered_events = sorted(
         (

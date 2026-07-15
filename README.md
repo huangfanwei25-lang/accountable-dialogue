@@ -31,8 +31,11 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 - [可觀測性與證據邊界](docs/contracts/observability-and-evidence-boundary.md)：哪些東西可被檢查，哪些仍必須誠實稱為不透明。
 - [公開邊界](PUBLIC_BOUNDARY.md)：什麼可以進公開倉庫，什麼必須留在受限環境。
 - [研究邊界：可問責的認識論行為](docs/research/behavioral-honesty-research-boundary.md)：若要研究「誠實相關行為」，什麼才是可測的問題。
+- [可問責的代理連續性 v0](docs/research/accountable-agent-continuity-v0.md)：將誠實、記憶、人格與治理拆成可反駁的研究問題，而非一個靈魂或誠實分數。
+- [舊概念整合邊界](docs/research/legacy-concepts-integration.md)：只重寫可公開的設計教訓，不搬入舊記憶、日誌或 runtime。
 - [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
 - [變更案件模型 v0](docs/design/change-case-v0.md)：第一個公開原型如何區分事項、依據、事件與唯讀投影。
+- [公開變更案件紀錄](records/change-case-v0/change-case-v0-prototype.json)：這個原型自身的 Artifact、證據、權限宣告與限制。
 - [任務板](task.md)：目前已接受的工作與尚待擁有者決定的事項。
 
 ## 最小模型
@@ -46,8 +49,8 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 
 例如，`Proposal` 是被處理的事項；它被另一個版本取代，是後來發生的
 `superseded` 事件。定案權描述的是某個治理事件由誰依何種範圍作出，不能被寫成
-另一個模糊的狀態欄位。治理、生命週期、實作與驗證的顯示值必須能由紀錄重算，
-而非彼此覆寫。
+另一個模糊的狀態欄位。治理與終止生命週期不以最後一筆靜默覆寫；可重複的實作與
+驗證事件則保留全歷史，投影只顯示 canonical sequence 中最新的報告及其來源 event id。
 
 這避免三種常見誤導：把好想法說成已實作、把通過測試說成已證明效果，或把
 有權者的決定誤寫成效果證據。
@@ -62,7 +65,7 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 ## 目前狀態
 
 - Repository state: `foundational / small validated prototype`
-- Change-case prototype: local Schema、validator 與唯讀 projection；只由合成案例驗證
+- Change-case prototype: local Schema、validator 與唯讀 projection；三個合成案例與一筆可檢查的 repository record
 - Deployable runtime, storage, or identity service: `not_implemented`
 - Dataset or training program: `not_implemented`
 - License: [Apache-2.0](LICENSE)，由公開倉庫初始化時的擁有者選擇。

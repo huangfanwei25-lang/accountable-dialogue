@@ -326,7 +326,8 @@
         },
         "sequence": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Canonical ledger order within this case; it is the ordering source for projections, not an external event timestamp."
         },
         "recorded_at": {
           "$ref": "#/$defs/timestamp"

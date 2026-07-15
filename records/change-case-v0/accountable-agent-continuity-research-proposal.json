@@ -1,0 +1,69 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-accountable-agent-continuity-research",
+  "public_summary": "公開 Proposal：研究可問責的代理連續性，但不把它描述成已訓練的誠實能力、人格核心或主觀內在。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-accountable-agent-continuity",
+      "kind": "proposal",
+      "public_summary": "以證據邊界、修正完整性、權限紀律與 revision continuity 研究代理跨時間的可問責行為。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-continuity-research",
+      "kind": "document",
+      "locator": "docs/research/accountable-agent-continuity-v0.md",
+      "revision": "v0.1-proposed"
+    },
+    {
+      "id": "artifact-existing-research-boundary",
+      "kind": "document",
+      "locator": "docs/research/behavioral-honesty-research-boundary.md",
+      "revision": "v0.1-proposed"
+    },
+    {
+      "id": "artifact-legacy-integration",
+      "kind": "document",
+      "locator": "docs/research/legacy-concepts-integration.md",
+      "revision": "v0.1-proposed"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-continuity-research-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-accountable-agent-continuity"],
+      "artifact_refs": ["artifact-existing-research-boundary", "artifact-legacy-integration"],
+      "public_summary": "目前沒有資料、模型介入、baseline、獨立 outcome labels 或實驗結果；此 Proposal 只定義可反駁的方向與公開邊界。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-continuity-research-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-15T15:23:03Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "依擁有者要求，以公開安全摘要建立研究 Proposal；未保留原始對話。",
+      "subject_refs": ["proposal-accountable-agent-continuity"]
+    },
+    {
+      "id": "event-continuity-research-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-15T15:23:04Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "等待擁有者審查研究詞彙、資料邊界與未來評估是否值得進一步設計。",
+      "subject_refs": ["proposal-accountable-agent-continuity"]
+    }
+  ]
+}

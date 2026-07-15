@@ -4,7 +4,7 @@
 > 文件類型：第一個公開程式切片的設計<br>
 > 授權範圍：擁有者已允許製作有界 prototype；整體契約仍為 `under_review`<br>
 > 工程狀態：`implemented`（本機 Schema、validator 與唯讀 projection）<br>
-> 驗證狀態：`verified_within_scope`（兩個合成案例與拒絕規則）
+> 驗證狀態：`verified_within_scope`（三個合成案例、repository record 與拒絕規則）
 
 ## 為何不叫作萬用 record
 
@@ -48,11 +48,16 @@ Artifact 是可定位且帶版本或 digest 的文件、程式、Schema、測試
 `superseded` 事件必須同時指向 `previous_subject_id` 與 `successor_subject_id`。舊
 subject 保留原文；新的 subject 才承載修正後的內容。
 
-v0 不是「最後一筆覆寫前一筆」的容器。每個 subject 必須恰有一筆
-`subject_created`，且任何後續事件都必須在它建立後才可引用它；
+v0 不是讓 subject、治理或終止生命週期以「最後一筆覆寫前一筆」的容器。每個
+subject 必須恰有一筆 `subject_created`，且任何後續事件都必須在它建立後才可引用它；
 `review_requested` 必須先於唯一的 `governance_decided`；`withdrawn`、
 `superseded` 與 `archived` 是互斥的終止事件。若真實情況需要重開、封存後再處置，
 必須以未來明確的事件模型擴充，而非讓 v0 projection 無聲選取最後一筆。
+
+實作與驗證是**可重複的報告事件**，不是終局狀態。`sequence` 是案件內的 canonical
+ledger order，projection 依它顯示最新的 report outcome 與其 event id；`recorded_at`
+不會取代這個順序，也不宣稱外部事件的精確發生時間。這個讀取結果不會刪除、合併或
+把任何 report 誤稱為永久世界狀態；需要完整脈絡時，讀取所有 events。
 
 治理定案也是 Event。它有 `decision.outcome`、`decision.made_by` 與
 `decision.authority_basis`：
@@ -75,10 +80,10 @@ Schema 的輸入不含 `governance_status`、`engineering_status`、`verificatio
 
 | 投影 | 起始／缺口 | 來源 |
 |---|---|---|
-| governance | `no_governance_record` | review 與最後一筆治理決定事件 |
+| governance | `no_governance_record` | review 與唯一的治理決定事件 |
 | lifecycle | `no_terminal_event` | withdrawn、superseded、archived 等事件 |
-| implementation | `no_implementation_report` | implementation_reported 事件 |
-| verification | `no_verification_record` | verification_recorded 事件 |
+| implementation | `no_implementation_report` | canonical sequence 中最新的 `implementation_reported` 及其 event id |
+| verification | `no_verification_record` | canonical sequence 中最新的 `verification_recorded` 及其 event id |
 
 這些是介面可顯示的讀取結果，不是可單獨寫入的真相。日後若快取，必須能由案件重新
 計算；帳本的缺口不可以偽裝成系統對現實的否定斷言。
@@ -94,7 +99,7 @@ Schema 的輸入不含 `governance_status`、`engineering_status`、`verificatio
 
 ## 驗收方式
 
-公開 prototype 包含 JSON Schema、兩個合成案例、純標準函式庫 validator 與測試。
+公開 prototype 包含 JSON Schema、三個合成案例、純標準函式庫 validator 與測試。
 目前測試接受 Proposal／治理定案與 Verification／Supersession，並拒絕：
 
 1. 在 subject 上直接寫 lifecycle 或 governance status；
@@ -103,6 +108,14 @@ Schema 的輸入不含 `governance_status`、`engineering_status`、`verificatio
 4. 缺少或重複建立事件、錯誤治理順序，以及會造成最後寫入覆蓋的終止事件；
 5. raw dialogue、hidden reasoning、prompt、token、email、絕對本機路徑、路徑穿越或
    file URI。
+
+## 對自己的紀錄
+
+[`records/change-case-v0/change-case-v0-prototype.json`](../../records/change-case-v0/change-case-v0-prototype.json)
+以同一個格式回溯記錄本 prototype 的 Artifact、證據、權限宣告與限制。它不是簽章、
+身份服務或不可變帳本；`recorded_at` 是帳本事件被記錄的時間，未必等同外部工作最初
+發生的時間。凡屬回溯記錄，摘要必須明示這一點，不能用精確 timestamp 假裝保有未曾
+保存的即時歷史。
 
 相關文件：[哲學／工程契約](../philosophy/engineering-contract.md)、
 [公開邊界](../../PUBLIC_BOUNDARY.md)、[公開面遷移清單](../plans/public-surface-intake-v0.md)。
