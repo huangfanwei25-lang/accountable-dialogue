@@ -51,6 +51,6 @@ what remains unproven?
 - Repository state: `foundational / documentation-first`
 - Runtime implementation: `not_implemented`
 - Dataset or training program: `not_implemented`
-- License: 尚未選定；在擁有者明確選擇前，不應假設可重用條款。
+- License: [Apache-2.0](LICENSE)，由公開倉庫初始化時的擁有者選擇。
 
 > 不替系統宣稱靈魂；只要求它對影響負責。

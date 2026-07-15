@@ -17,7 +17,7 @@
 
 - [x] Create an independent repository with a new root commit.
 - [x] State the system's observable purpose and explicit non-claims in `README.md`.
-- [x] Leave licensing as an owner decision rather than guessing a legal grant.
+- [x] Preserve the owner-selected Apache-2.0 license rather than guessing a legal grant.
 **Success criteria**: a new reader can distinguish accountability infrastructure from consciousness or honesty claims.
 
 ## Phase 2: Establish the public boundary
