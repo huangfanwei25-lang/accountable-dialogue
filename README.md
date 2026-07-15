@@ -8,7 +8,8 @@ commitment, decision, correction, or system change is made, can another person
 later determine what changed, why, on whose authority, with what evidence, and
 what remains unproven?
 
-目前這是一個**文件先行的公開基線**，尚未宣稱具備可部署的 runtime、訓練系統或資料集。
+目前這是一個**文件先行、帶有最小本機 prototype 的公開基線**。它尚未宣稱具備可部署的
+runtime、訓練系統、資料集、身份服務或持久化帳本。
 
 ## 它是什麼
 
@@ -31,15 +32,25 @@ what remains unproven?
 - [公開邊界](PUBLIC_BOUNDARY.md)：什麼可以進公開倉庫，什麼必須留在受限環境。
 - [研究邊界：可問責的認識論行為](docs/research/behavioral-honesty-research-boundary.md)：若要研究「誠實相關行為」，什麼才是可測的問題。
 - [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
+- [變更案件模型 v0](docs/design/change-case-v0.md)：第一個公開原型如何區分事項、依據、事件與唯讀投影。
 - [任務板](task.md)：目前已接受的工作與尚待擁有者決定的事項。
 
 ## 最小模型
 
-每筆紀錄先區分它是 `Observation`、`Claim`、`Proposal`、`Commitment`、
-`Decision`、`Evidence`、`Artifact`、`Verification` 或 `Event`；再分別描述它的
-治理、工程、驗證與生命週期狀態。
+先區分四個不能混在一起的問題：
 
-這避免兩種常見誤導：把好想法說成已實作，或把通過測試說成已證明其效果。
+- **事項（subject）**是什麼：例如 `Observation`、`Claim`、`Proposal` 或 `Commitment`；
+- **依據（artifact / evidence）**可核對什麼；
+- **事件（event）**這次發生什麼：例如送審、定案、驗證、撤回或替換；
+- **投影（projection）**目前的事件歷史能支持什麼描述。
+
+例如，`Proposal` 是被處理的事項；它被另一個版本取代，是後來發生的
+`superseded` 事件。定案權描述的是某個治理事件由誰依何種範圍作出，不能被寫成
+另一個模糊的狀態欄位。治理、生命週期、實作與驗證的顯示值必須能由紀錄重算，
+而非彼此覆寫。
+
+這避免三種常見誤導：把好想法說成已實作、把通過測試說成已證明效果，或把
+有權者的決定誤寫成效果證據。
 
 ## 公開承諾
 
@@ -50,8 +61,9 @@ what remains unproven?
 
 ## 目前狀態
 
-- Repository state: `foundational / documentation-first`
-- Runtime implementation: `not_implemented`
+- Repository state: `foundational / small validated prototype`
+- Change-case prototype: local Schema、validator 與唯讀 projection；只由合成案例驗證
+- Deployable runtime, storage, or identity service: `not_implemented`
 - Dataset or training program: `not_implemented`
 - License: [Apache-2.0](LICENSE)，由公開倉庫初始化時的擁有者選擇。
 

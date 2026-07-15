@@ -1,0 +1,81 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-subject-event-model",
+  "public_summary": "合成範例：以 subject、evidence、event 與 projection 分離公開變更案件。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-subject-event-model",
+      "kind": "proposal",
+      "public_summary": "建立不把內容類型與歷史變化混在一起的最小公開模型。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-contract-v0",
+      "kind": "document",
+      "locator": "docs/philosophy/engineering-contract.md",
+      "revision": "example:contract-v0"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-contract-review",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-subject-event-model"],
+      "artifact_refs": ["artifact-contract-v0"],
+      "public_summary": "契約已明確要求事項、事件、權限與證據分離。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-proposal-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-15T09:00:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中建立候選 Proposal。",
+      "subject_refs": ["proposal-subject-event-model"]
+    },
+    {
+      "id": "event-review-requested",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-15T09:05:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中請擁有者審查 Proposal。",
+      "subject_refs": ["proposal-subject-event-model"]
+    },
+    {
+      "id": "event-owner-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-15T09:10:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中由擁有者接受有界 prototype。",
+      "subject_refs": ["proposal-subject-event-model"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": ["public_schema_prototype"]
+        },
+        "effective_at": "2026-07-15T09:10:00Z"
+      }
+    }
+  ]
+}

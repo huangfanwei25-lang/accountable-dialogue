@@ -1,0 +1,482 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/huangfanwei25-lang/accountable-dialogue/blob/main/schemas/change-case-v0.schema.json",
+  "title": "Accountable Dialogue Change Case v0",
+  "description": "Public, bounded change case. Cross-reference and privacy rules are checked by the accompanying validator.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "case_id",
+    "public_summary",
+    "visibility",
+    "subjects",
+    "artifacts",
+    "evidence",
+    "events"
+  ],
+  "properties": {
+    "format": {
+      "const": "accountable-dialogue/change-case-v0"
+    },
+    "case_id": {
+      "$ref": "#/$defs/id"
+    },
+    "public_summary": {
+      "$ref": "#/$defs/summary"
+    },
+    "visibility": {
+      "const": "public"
+    },
+    "subjects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/subject"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifact"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{2,63}$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "role"],
+      "properties": {
+        "kind": {
+          "enum": ["human", "agent", "automation"]
+        },
+        "role": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_-]{1,63}$"
+        }
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "public_summary"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": ["observation", "claim", "proposal", "commitment"]
+        },
+        "public_summary": {
+          "$ref": "#/$defs/summary"
+        }
+      }
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "locator", "revision"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": ["document", "schema", "source_file", "test", "external_source"]
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "relation",
+        "subject_refs",
+        "artifact_refs",
+        "public_summary"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "test_result",
+            "schema_check",
+            "artifact_review",
+            "source",
+            "runtime_observation",
+            "attestation"
+          ]
+        },
+        "relation": {
+          "enum": ["supports", "challenges", "limits"]
+        },
+        "subject_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "artifact_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "public_summary": {
+          "$ref": "#/$defs/summary"
+        }
+      }
+    },
+    "authority_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "scope"],
+      "properties": {
+        "kind": {
+          "enum": ["owner", "explicit_delegation"]
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{1,63}$"
+          }
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "const": "explicit_delegation"
+              }
+            }
+          },
+          "then": {
+            "required": ["reference"]
+          }
+        }
+      ]
+    },
+    "decision_maker": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/actor"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "human"
+            },
+            "role": {
+              "enum": ["repository_owner", "authorized_delegate"]
+            }
+          }
+        }
+      ]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "made_by", "authority_basis", "effective_at"],
+      "properties": {
+        "outcome": {
+          "enum": ["ratified", "rejected"]
+        },
+        "made_by": {
+          "$ref": "#/$defs/decision_maker"
+        },
+        "authority_basis": {
+          "$ref": "#/$defs/authority_basis"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "scope", "limitations"],
+      "properties": {
+        "outcome": {
+          "enum": ["reported_partial", "reported_implemented"]
+        },
+        "scope": {
+          "$ref": "#/$defs/summary"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/summary"
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["outcome", "method", "scope", "limitations"],
+      "properties": {
+        "outcome": {
+          "enum": ["inconclusive", "partially_verified", "verified_within_scope", "failed"]
+        },
+        "method": {
+          "$ref": "#/$defs/summary"
+        },
+        "scope": {
+          "$ref": "#/$defs/summary"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/summary"
+          }
+        }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "sequence", "recorded_at", "recorded_by", "public_summary"],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "subject_created",
+            "review_requested",
+            "governance_decided",
+            "implementation_reported",
+            "verification_recorded",
+            "withdrawn",
+            "superseded",
+            "archived"
+          ]
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "recorded_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "recorded_by": {
+          "$ref": "#/$defs/actor"
+        },
+        "public_summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "subject_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "decision": {
+          "$ref": "#/$defs/decision"
+        },
+        "implementation": {
+          "$ref": "#/$defs/implementation"
+        },
+        "verification": {
+          "$ref": "#/$defs/verification"
+        },
+        "previous_subject_id": {
+          "$ref": "#/$defs/id"
+        },
+        "successor_subject_id": {
+          "$ref": "#/$defs/id"
+        }
+      },
+      "dependentSchemas": {
+        "subject_refs": {
+          "properties": {
+            "kind": {
+              "enum": [
+                "subject_created",
+                "review_requested",
+                "governance_decided",
+                "implementation_reported",
+                "verification_recorded",
+                "withdrawn",
+                "archived"
+              ]
+            }
+          }
+        },
+        "evidence_refs": {
+          "properties": {
+            "kind": {
+              "const": "verification_recorded"
+            }
+          }
+        },
+        "decision": {
+          "properties": {
+            "kind": {
+              "const": "governance_decided"
+            }
+          }
+        },
+        "implementation": {
+          "properties": {
+            "kind": {
+              "const": "implementation_reported"
+            }
+          }
+        },
+        "verification": {
+          "properties": {
+            "kind": {
+              "const": "verification_recorded"
+            }
+          }
+        },
+        "previous_subject_id": {
+          "properties": {
+            "kind": {
+              "const": "superseded"
+            }
+          }
+        },
+        "successor_subject_id": {
+          "properties": {
+            "kind": {
+              "const": "superseded"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "const": "governance_decided"
+              }
+            }
+          },
+          "then": {
+            "required": ["subject_refs", "decision"]
+          }
+        },
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "const": "implementation_reported"
+              }
+            }
+          },
+          "then": {
+            "required": ["subject_refs", "implementation"]
+          }
+        },
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "const": "verification_recorded"
+              }
+            }
+          },
+          "then": {
+            "required": ["subject_refs", "evidence_refs", "verification"]
+          }
+        },
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "const": "superseded"
+              }
+            }
+          },
+          "then": {
+            "required": ["previous_subject_id", "successor_subject_id"]
+          }
+        },
+        {
+          "if": {
+            "required": ["kind"],
+            "properties": {
+              "kind": {
+                "enum": ["subject_created", "review_requested", "withdrawn", "archived"]
+              }
+            }
+          },
+          "then": {
+            "required": ["subject_refs"]
+          }
+        }
+      ]
+    }
+  }
+}

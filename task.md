@@ -36,7 +36,7 @@
 
 ## Phase 4: First implementation slice
 
-- [ ] Choose one small, testable public capability after the contract is ratified.
+- [x] Owner authorizes a bounded `change-case-v0` prototype, while the wider contract remains under review.
 - [ ] Add tests before implementation and record its Artifact, evidence, authority and limits.
 **Success criteria**: the first code change proves the contract is useful without constructing a premature platform.
 
@@ -69,5 +69,45 @@ deployment claim in this foundation commit.
 ## Phase 3: Await a bounded first implementation decision
 
 - [ ] Owner ratifies, narrows, or rejects the proposed contract vocabulary.
-- [ ] Owner decides whether `change-record-v0` is the first public code slice.
+- [x] Owner chooses a bounded `change-case-v0` as the first public code slice (2026-07-15).
 **Success criteria**: no schema, examples, validator, dataset, or runtime is described as accepted before the owner chooses its boundary.
+
+---
+
+## Active Short Board: Change Case v0 (2026-07-15)
+
+> Owner authorized a small prototype and corrected the model: `Proposal` is a
+> subject type; `superseded` is an event. This board does not ratify the wider
+> philosophy contract, create a persistence service, or authorize private data.
+
+## Phase 1: Separate semantic layers
+
+- [x] Replace the ambiguous `change-record-v0` working name with `change-case-v0`.
+- [x] Separate subject, artifact, evidence, event, and derived projection.
+- [x] Remove writable `authority.status` and status-axis fields from the v0 input.
+**Success criteria**: type, occurrence, authority, evidence, and display state cannot silently overwrite one another.
+
+## Phase 2: Specify and test the boundary
+
+- [x] Add a public JSON Schema and two synthetic cases.
+- [x] Write red tests for valid cases and for rejected conflated/private fields.
+**Success criteria**: a reader can see both the accepted shape and the dangerous shapes it rejects.
+
+## Phase 3: Implement only the minimum interpreter
+
+- [x] Add a standard-library validator for local shape and cross-reference checks.
+- [x] Add a pure, read-only projection for a subject's recorded history.
+**Success criteria**: validation and projection have no network, database, LLM, memory, or mutation dependency.
+
+## Phase 4: Verify and publish accurately
+
+- [x] Run tests, lint, Markdown link checks, and staged-diff checks.
+- [x] Update README with the exact prototype scope and known limits.
+**Success criteria**: the public claim matches the files, tests, and limits actually present.
+
+Verification evidence (2026-07-15): `python -m pytest tests/ -x` passed 6 tests;
+`python -m ruff check accountable_dialogue tests` passed; the public JSON Schema
+and both synthetic examples validated with Draft 2020-12; all local Markdown links
+resolve; no trailing whitespace or legacy labels remain; and `git diff --check`
+passed. The pytest run emitted 12 deprecation warnings from the pre-installed
+`pytest-freezegun` plugin, not from this repository's code.

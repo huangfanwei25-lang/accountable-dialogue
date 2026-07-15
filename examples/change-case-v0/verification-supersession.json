@@ -1,0 +1,94 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-claim-correction",
+  "public_summary": "合成範例：失敗的驗證範圍促成更窄的 Claim，舊 Claim 被保留並標示為已替換。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "claim-broad-v1",
+      "kind": "claim",
+      "public_summary": "所有輸入都會通過同一項結構檢查。"
+    },
+    {
+      "id": "claim-narrow-v2",
+      "kind": "claim",
+      "public_summary": "列出的 JSON 變更案件會通過指定的結構檢查。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-synthetic-test",
+      "kind": "test",
+      "locator": "tests/test_change_case.py",
+      "revision": "example:test-v0"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-broad-claim-failed",
+      "kind": "test_result",
+      "relation": "challenges",
+      "subject_refs": ["claim-broad-v1"],
+      "artifact_refs": ["artifact-synthetic-test"],
+      "public_summary": "合成驗證只涵蓋指定 JSON 結構，不能支持所有輸入的廣泛主張。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-broad-claim-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-15T10:00:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中建立原始 Claim。",
+      "subject_refs": ["claim-broad-v1"]
+    },
+    {
+      "id": "event-broad-claim-verified",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-15T10:05:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中記錄驗證範圍不足以支持原始 Claim。",
+      "subject_refs": ["claim-broad-v1"],
+      "evidence_refs": ["evidence-broad-claim-failed"],
+      "verification": {
+        "outcome": "failed",
+        "method": "synthetic validator test",
+        "scope": "僅涵蓋列出的 JSON 變更案件。",
+        "limitations": ["未涵蓋其他輸入格式。"]
+      }
+    },
+    {
+      "id": "event-narrow-claim-created",
+      "kind": "subject_created",
+      "sequence": 3,
+      "recorded_at": "2026-07-15T10:10:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "合成範例中建立範圍較窄的新 Claim。",
+      "subject_refs": ["claim-narrow-v2"]
+    },
+    {
+      "id": "event-claim-superseded",
+      "kind": "superseded",
+      "sequence": 4,
+      "recorded_at": "2026-07-15T10:15:00Z",
+      "recorded_by": {
+        "kind": "human",
+        "role": "repository_owner"
+      },
+      "public_summary": "合成範例中以範圍較窄的 Claim 取代已被驗證限制的舊 Claim。",
+      "previous_subject_id": "claim-broad-v1",
+      "successor_subject_id": "claim-narrow-v2"
+    }
+  ]
+}
