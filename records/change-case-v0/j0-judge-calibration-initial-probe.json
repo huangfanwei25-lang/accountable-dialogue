@@ -1,0 +1,115 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-j0-judge-calibration-initial-probe",
+  "public_summary": "此變更帳保留 J0 固定初始 probe 的唯一結果：兩筆 Qwen 與一筆 Llama 的全合成 local-only 呼叫都得到 transport_error，沒有 raw response 或 label comparison。這是服務／傳輸相容性的 inconclusive observation，不是模型 judge、人類盲評或內在性質結論。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "observation-j0-initial-transport-result",
+      "kind": "observation",
+      "public_summary": "在固定 J0 v0 fixture、token、timeout、wall-time 與 loopback Ollama 環境中，三次預先選定的呼叫均未取得可解析的 judge verdict；此 observation 只描述 transport outcome。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-j0-probe-status",
+      "kind": "document",
+      "locator": "docs/status/j0-judge-calibration-initial-probe-20260716.md",
+      "revision": "13172a431e5339a5ac7a3d030ae819090e940c51"
+    },
+    {
+      "id": "artifact-j0-probe-plan",
+      "kind": "document",
+      "locator": "docs/plans/j0-small-model-judge-feasibility-v0.md",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-probe-harness",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/judge_calibration.py",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-probe-runner",
+      "kind": "source_file",
+      "locator": "scripts/run_judge_calibration.py",
+      "revision": "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+    },
+    {
+      "id": "artifact-j0-probe-result-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/13172a431e5339a5ac7a3d030ae819090e940c51",
+      "revision": "13172a431e5339a5ac7a3d030ae819090e940c51"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-j0-probe-runtime",
+      "kind": "runtime_observation",
+      "relation": "supports",
+      "subject_refs": ["observation-j0-initial-transport-result"],
+      "artifact_refs": ["artifact-j0-probe-status"],
+      "public_summary": "固定順序的 Qwen、Qwen、Llama 呼叫分別在約 7.382、4.521、11.903 秒後被 runner 記為 transport_error；三筆 raw_response 為 null、label comparison 為零，且 wall-time gate 未中斷整輪。"
+    },
+    {
+      "id": "evidence-j0-probe-boundary",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["observation-j0-initial-transport-result"],
+      "artifact_refs": [
+        "artifact-j0-probe-plan",
+        "artifact-j0-probe-harness",
+        "artifact-j0-probe-runner"
+      ],
+      "public_summary": "runner 先確認兩個模型已安裝並記錄 resolved id，固定三次 local-only 呼叫，將 raw output 與 manifest 寫入 repository 外，並明示不將 expected verdicts 送入模型。沒有 pull、download、retry 或公開 raw output。"
+    },
+    {
+      "id": "evidence-j0-probe-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["observation-j0-initial-transport-result"],
+      "artifact_refs": ["artifact-j0-probe-status", "artifact-j0-probe-result-commit"],
+      "public_summary": "transport_error 沒有保留可判讀的服務端原因或模型文字；公開 status 只保留合成、最小充分的設定與機械結果。故本次不能區分服務版本、HTTP failure、模型載入或其他 transport 原因。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-j0-probe-observation-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T14:03:18Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 J0 initial-probe transport observation，保留已執行的固定矩陣，不將無輸出的結果描述成模型心理或語義判斷。",
+      "subject_refs": ["observation-j0-initial-transport-result"]
+    },
+    {
+      "id": "event-j0-probe-inconclusive",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T14:03:19Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄本輪已完成但沒有 verdict 的 transport result 為 inconclusive；任何後繼診斷或新 probe 都須另建 successor，不得重寫本輪。",
+      "subject_refs": ["observation-j0-initial-transport-result"],
+      "evidence_refs": [
+        "evidence-j0-probe-runtime",
+        "evidence-j0-probe-boundary",
+        "evidence-j0-probe-limit"
+      ],
+      "verification": {
+        "outcome": "inconclusive",
+        "method": "固定三次 local-only J0 execution；檢查 repository 外 manifest、逐列 mechanical status、raw-response presence 與 label-comparison count。",
+        "scope": "只描述此 runner、兩個已安裝模型、兩個全合成 case、固定 token／timeout／wall-time 設定所觀察到的 transport outcome。",
+        "limitations": [
+          "三筆皆未取得 verdict，不能判斷 Qwen 或 Llama 的語義判斷能力、格式能力、資源上限或彼此相對表現。",
+          "沒有兩位外部獨立人類的 H1 verdict，亦不推論 H1、B0/I1、真實世界真值，或模型的誠實、人格、意識與自我認知。"
+        ]
+      }
+    }
+  ]
+}

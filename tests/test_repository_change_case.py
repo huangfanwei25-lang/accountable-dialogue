@@ -26,6 +26,7 @@ LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION = "bee65f1e03849d18a7173d40b22fa99f5738
 H1_BLIND_ANNOTATION_PREPARATION_REVISION = "415e10fe869c16044b6bfa821ef3e49260375d73"
 J0_JUDGE_CALIBRATION_HARNESS_REVISION = "5d006b3dcefb7a089376a1b362e094a26b27e677"
 J0_JUDGE_CALIBRATION_LAUNCH_FIX_REVISION = "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+J0_JUDGE_CALIBRATION_INITIAL_PROBE_REVISION = "13172a431e5339a5ac7a3d030ae819090e940c51"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -373,6 +374,30 @@ class RepositoryChangeCaseTests(unittest.TestCase):
 
         verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
         self.assertTrue(any("沒有 Qwen 或 Llama output" in item for item in verification["limitations"]))
+
+    def test_j0_initial_probe_preserves_transport_errors_without_a_judge_claim(self) -> None:
+        record = load_record("j0-judge-calibration-initial-probe.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            J0_JUDGE_CALIBRATION_INITIAL_PROBE_REVISION,
+            artifacts["artifact-j0-probe-status"]["revision"],
+        )
+        self.assertEqual(
+            J0_JUDGE_CALIBRATION_INITIAL_PROBE_REVISION,
+            artifacts["artifact-j0-probe-result-commit"]["revision"],
+        )
+
+        projection = project_subject(record, "observation-j0-initial-transport-result")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("inconclusive", projection.verification)
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertEqual("inconclusive", verification["outcome"])
+        self.assertTrue(any("不能判斷 Qwen 或 Llama 的語義判斷能力" in item for item in verification["limitations"]))
 
 
 if __name__ == "__main__":
