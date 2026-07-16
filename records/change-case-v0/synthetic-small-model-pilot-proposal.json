@@ -28,6 +28,30 @@
       "kind": "document",
       "locator": "docs/research/synthetic-evaluation-protocol-v0.md",
       "revision": "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
+    },
+    {
+      "id": "artifact-pilot-harness-source",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "625356bad1db84a2627854fe702109437b58d948"
+    },
+    {
+      "id": "artifact-pilot-fixture-schema",
+      "kind": "schema",
+      "locator": "schemas/synthetic-evaluation-case-v0.schema.json",
+      "revision": "625356bad1db84a2627854fe702109437b58d948"
+    },
+    {
+      "id": "artifact-pilot-harness-tests",
+      "kind": "test",
+      "locator": "tests/test_synthetic_pilot.py",
+      "revision": "625356bad1db84a2627854fe702109437b58d948"
+    },
+    {
+      "id": "artifact-pilot-harness-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/625356bad1db84a2627854fe702109437b58d948",
+      "revision": "625356bad1db84a2627854fe702109437b58d948"
     }
   ],
   "evidence": [
@@ -46,6 +70,22 @@
       "subject_refs": ["proposal-synthetic-small-model-pilot"],
       "artifact_refs": ["artifact-small-model-pilot-plan", "artifact-small-model-pilot-commit"],
       "public_summary": "尚未建立 fixture、annotation key、runner、run manifest 或模型輸出；授權不涵蓋訓練、私人資料、H4b 讀者研究、公開未審查原始輸出或內在性質結論。"
+    },
+    {
+      "id": "evidence-pilot-harness-local-check",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "artifact_refs": ["artifact-pilot-harness-source", "artifact-pilot-fixture-schema", "artifact-pilot-harness-tests"],
+      "public_summary": "代理在 commit 前本機執行 pytest tests/，25 項測試通過；ruff 檢查 accountable_dialogue、tests、scripts 通過，且本機 Markdown links 可解析。這是 harness 檢查，不是 live model 結果。"
+    },
+    {
+      "id": "evidence-pilot-harness-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "artifact_refs": ["artifact-pilot-harness-source", "artifact-pilot-harness-commit"],
+      "public_summary": "runner 尚未呼叫真實模型；fake transport、JSON envelope 與 loopback guards 只能驗證執行邊界，不能證明任一模型在六案的語義行為。"
     }
   ],
   "events": [
@@ -95,6 +135,48 @@
           "scope": ["synthetic_pilot", "local_model_execution"]
         },
         "effective_at": "2026-07-16T05:22:19Z"
+      }
+    },
+    {
+      "id": "event-small-model-pilot-harness-implemented",
+      "kind": "implementation_reported",
+      "sequence": 4,
+      "recorded_at": "2026-07-16T05:36:03Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回報已建立受限 Schema、六個合成 fixtures、獨立 annotation key 與只允許本機 Ollama 的 runner；未產生或保存真實模型輸出。",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "只涵蓋固定 pilot input、loopback-only execution 與倉庫外 raw-output 路徑。",
+        "limitations": [
+          "沒有 live model execution、語義標註或效果結果。",
+          "不包含訓練、私人資料、H4b 讀者研究或公開未審查輸出。"
+        ]
+      }
+    },
+    {
+      "id": "event-small-model-pilot-harness-verified",
+      "kind": "verification_recorded",
+      "sequence": 5,
+      "recorded_at": "2026-07-16T05:36:04Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄固定 fixtures、B0／I1 material equivalence、label exclusion、loopback guard 與 fake transport 的本機範圍驗證；不是模型行為驗證。",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "evidence_refs": ["evidence-pilot-harness-local-check", "evidence-pilot-harness-limit"],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "pytest tests/、ruff check accountable_dialogue tests scripts、local Markdown link check",
+        "scope": "25 項本機測試涵蓋 public fixture shape、renderer isolation、annotation digest、fake transport 與 output-path guards。",
+        "limitations": [
+          "未執行 qwen2.5:1.5b 或 llama3.2:3b。",
+          "未驗證任何語義 label、比較結果、使用者歸因或模型內在性質。"
+        ]
       }
     }
   ]

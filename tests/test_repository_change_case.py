@@ -16,6 +16,7 @@ PROTOCOL_REVISION = "c9d43c52320c90d598e5ad899c51416c091cb880"
 PROTOCOL_REFINEMENT_REVISION = "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
 EVALUATION_CASE_DESIGN_REVISION = "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
 SMALL_MODEL_PILOT_PLAN_REVISION = "790663cf9929e2d3ff28c24d271c477d6a110013"
+SMALL_MODEL_PILOT_HARNESS_REVISION = "625356bad1db84a2627854fe702109437b58d948"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -124,7 +125,7 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("no_verification_record", projection.verification)
 
-    def test_small_model_pilot_has_a_limited_owner_authorization_but_no_run_claim(self) -> None:
+    def test_small_model_pilot_has_limited_authorization_and_a_harness_but_no_live_run_claim(self) -> None:
         record = load_record("synthetic-small-model-pilot-proposal.json")
 
         self.assertEqual([], validate_change_case(record))
@@ -134,11 +135,17 @@ class RepositoryChangeCaseTests(unittest.TestCase):
             SMALL_MODEL_PILOT_PLAN_REVISION,
             artifacts["artifact-small-model-pilot-plan"]["revision"],
         )
+        self.assertEqual(
+            SMALL_MODEL_PILOT_HARNESS_REVISION,
+            artifacts["artifact-pilot-harness-source"]["revision"],
+        )
 
         projection = project_subject(record, "proposal-synthetic-small-model-pilot")
         self.assertEqual("ratified", projection.governance)
-        self.assertEqual("no_implementation_report", projection.implementation)
-        self.assertEqual("no_verification_record", projection.verification)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+        self.assertEqual("event-small-model-pilot-harness-implemented", projection.implementation_event_id)
+        self.assertEqual("event-small-model-pilot-harness-verified", projection.verification_event_id)
 
         decision = next(event["decision"] for event in record["events"] if event["kind"] == "governance_decided")
         self.assertEqual("human", decision["made_by"]["kind"])
