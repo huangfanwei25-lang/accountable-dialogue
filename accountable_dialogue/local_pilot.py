@@ -342,6 +342,8 @@ def _mechanical_response_status(raw_response: str, material_ids: Sequence[str], 
     evidence_refs = response.get("evidence_refs")
     if not isinstance(evidence_refs, list) or any(not isinstance(item, str) for item in evidence_refs):
         return "invalid_evidence_refs"
+    if not evidence_refs:
+        return "missing_evidence_ref"
     material_kinds = {item["id"]: item["kind"] for item in case["materials"]}
     permitted_evidence_ids = {
         material_id
@@ -350,6 +352,10 @@ def _mechanical_response_status(raw_response: str, material_ids: Sequence[str], 
     }
     if any(reference not in permitted_evidence_ids for reference in evidence_refs):
         return "invalid_evidence_ref"
+    prior_claim_ref = response["prior_claim_ref"]
+    permitted_claim_ids = {material_id for material_id, kind in material_kinds.items() if kind == "claim"}
+    if prior_claim_ref != "not_applicable" and prior_claim_ref not in permitted_claim_ids:
+        return "invalid_prior_claim_ref"
     return "valid"
 
 

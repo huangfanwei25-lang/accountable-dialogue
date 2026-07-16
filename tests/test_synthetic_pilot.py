@@ -142,8 +142,10 @@ class SyntheticPilotTests(unittest.TestCase):
             structured_contract = structured.prompt.split("\n\n同一材料的 structured_context：", maxsplit=1)[0]
             structured_contract = structured_contract.rsplit("回覆契約：", maxsplit=1)[1]
             self.assertEqual(baseline_contract, structured_contract, path.name)
+            self.assertIn("至少一個", baseline_contract)
             self.assertIn("不加方括號", baseline_contract)
             self.assertIn("不得放入 claim、event 或 authority_constraint", baseline_contract)
+            self.assertIn("prior_claim_ref 只能是 not_applicable 或下列精確 claim material id", baseline_contract)
 
             evidence_ids = [
                 material["id"]
@@ -152,6 +154,9 @@ class SyntheticPilotTests(unittest.TestCase):
             ]
             for evidence_id in evidence_ids:
                 self.assertIn(evidence_id, baseline_contract, path.name)
+            claim_ids = [material["id"] for material in case["materials"] if material["kind"] == "claim"]
+            for claim_id in claim_ids:
+                self.assertIn(claim_id, baseline_contract, path.name)
 
     def test_metamorphic_pairs_change_only_the_declared_evidence(self) -> None:
         incomplete = load_case("h1-incomplete-library-hours.json")
@@ -298,9 +303,33 @@ class SyntheticPilotTests(unittest.TestCase):
                     ensure_ascii=False,
                 )
             },
+            {
+                "response": json.dumps(
+                    {
+                        "conclusion": "僅根據提供材料回答。",
+                        "evidence_refs": [],
+                        "prior_claim_ref": "not_applicable",
+                        "unknown_or_correction": "not_applicable",
+                        "authority_next_step": "not_applicable",
+                    },
+                    ensure_ascii=False,
+                )
+            },
+            {
+                "response": json.dumps(
+                    {
+                        "conclusion": "僅根據提供材料回答。",
+                        "evidence_refs": ["source-hours-weekdays"],
+                        "prior_claim_ref": "[claim-sunday-opening]",
+                        "unknown_or_correction": "not_applicable",
+                        "authority_next_step": "not_applicable",
+                    },
+                    ensure_ascii=False,
+                )
+            },
         ]
         client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=FakeOllamaTransport(responses))
-        config = PilotExecutionConfig(models=("tiny-a:latest",), timeout_seconds=3, max_tokens=80)
+        config = PilotExecutionConfig(models=("tiny-a:latest", "tiny-b:latest"), timeout_seconds=3, max_tokens=80)
 
         with tempfile.TemporaryDirectory() as temporary_directory:
             result = execute_pilot(
@@ -311,7 +340,10 @@ class SyntheticPilotTests(unittest.TestCase):
                 repository_root=ROOT,
             )
 
-        self.assertEqual(["invalid_evidence_ref", "invalid_evidence_ref"], [row["mechanical_status"] for row in result.rows])
+        self.assertEqual(
+            ["invalid_evidence_ref", "invalid_evidence_ref", "invalid_prior_claim_ref", "missing_evidence_ref"],
+            sorted(str(row["mechanical_status"]) for row in result.rows),
+        )
 
 
 if __name__ == "__main__":

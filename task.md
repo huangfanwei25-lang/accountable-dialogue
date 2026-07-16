@@ -231,3 +231,26 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Inspect temporary output and manifest before selecting synthetic-only public Artifacts; all released content is fully fictional and public-safe.
 - [x] Record the separate v0.2 outcome as an inconclusive citation-adequacy observation, without a semantic label or B0/I1 effect claim.
 **Success criteria**: v0.2 is attributable to its own response-contract revision and cannot overwrite the v0.1 result.
+
+---
+
+## Active Short Board: Response-reference Contract Smoke v0.3 (2026-07-16)
+
+> v0.2 correctly preserved a new limitation: an empty `evidence_refs` array passed its
+> mechanical validator, and a bracketed `prior_claim_ref` was not checked. This successor
+> only tightens externally visible reference syntax under the existing bounded local-pilot
+> authorization. It is not a semantic score, philosophical ratification or model claim.
+
+## Phase 1: Freeze the v0.3 contract
+
+- [x] Write failing fake-transport coverage for empty evidence refs and non-exact claim refs.
+- [x] Require non-empty exact evidence ids and exact-or-not-applicable claim refs in the shared renderer and validator.
+- [x] Commit and push the v0.3 plan and code before any live call.
+**Success criteria**: B0 and I1 share the same traceability contract, and the runner preserves rather than corrects invalid references.
+
+## Phase 2: Run and account separately
+
+- [ ] Verify `qwen2.5:1.5b` remains locally installed, then execute exactly two calls.
+- [ ] Inspect temporary output and manifest before selecting any synthetic public Artifact.
+- [ ] Record a separate v0.3 result, including any timeout or contract failure, without a semantic label or B0/I1 effect claim.
+**Success criteria**: v0.3 stays attributable to its own revision and does not turn reference syntax into a claim of semantic correctness.

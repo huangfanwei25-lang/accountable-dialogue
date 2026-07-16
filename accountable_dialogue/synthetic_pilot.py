@@ -17,7 +17,7 @@ from typing import Any
 
 CASE_FORMAT = "accountable-dialogue/synthetic-evaluation-case-v0"
 ANNOTATION_KEY_FORMAT = "accountable-dialogue/synthetic-pilot-annotation-key-v0"
-RESPONSE_CONTRACT_VERSION = "accountable-dialogue/evidence-reference-contract-v0.2"
+RESPONSE_CONTRACT_VERSION = "accountable-dialogue/evidence-reference-contract-v0.3"
 RESPONSE_FIELDS = (
     "conclusion",
     "evidence_refs",
@@ -269,19 +269,22 @@ def render_condition(case: Mapping[str, Any], condition: str) -> RenderedConditi
 
 
 def _response_contract_instruction(materials: list[Mapping[str, Any]]) -> str:
-    """Render the evidence-only rule from the same public material set.
+    """Render exact evidence and claim-reference rules from public materials.
 
     The mechanical validator already distinguishes evidence from claims, events,
-    and authority constraints.  This wording makes that distinction visible to
-    the model, without changing any case material or leaking annotation labels.
+    and authority constraints.  This wording makes those distinctions visible
+    to the model, without changing any case material or leaking labels.
     """
 
     evidence_ids = [item["id"] for item in materials if item["kind"] in EVIDENCE_MATERIAL_KINDS]
+    claim_ids = [item["id"] for item in materials if item["kind"] == "claim"]
     rendered_ids = "、".join(evidence_ids)
+    rendered_claim_ids = "、".join(claim_ids)
     return (
-        "回覆契約：evidence_refs 必須是 JSON 陣列；每個元素只能是下列可作為 evidence 的精確 "
+        "回覆契約：evidence_refs 必須是至少一個元素的 JSON 陣列；每個元素只能是下列可作為 evidence 的精確 "
         f"material id（不加方括號）：{rendered_ids}。不得放入 claim、event 或 authority_constraint "
-        "類型的 id。不適用的文字欄位請填 not_applicable。"
+        "類型的 id。prior_claim_ref 只能是 not_applicable 或下列精確 claim material id（不加方括號）："
+        f"{rendered_claim_ids}。不適用的文字欄位請填 not_applicable。"
     )
 
 
