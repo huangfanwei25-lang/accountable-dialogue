@@ -27,6 +27,7 @@ H1_BLIND_ANNOTATION_PREPARATION_REVISION = "415e10fe869c16044b6bfa821ef3e4926037
 J0_JUDGE_CALIBRATION_HARNESS_REVISION = "5d006b3dcefb7a089376a1b362e094a26b27e677"
 J0_JUDGE_CALIBRATION_LAUNCH_FIX_REVISION = "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
 J0_JUDGE_CALIBRATION_INITIAL_PROBE_REVISION = "13172a431e5339a5ac7a3d030ae819090e940c51"
+J0_HOST_COMPATIBILITY_DIAGNOSIS_REVISION = "61d3cbd0d1e453d02340e597b01a80c760977171"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -398,6 +399,25 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
         self.assertEqual("inconclusive", verification["outcome"])
         self.assertTrue(any("不能判斷 Qwen 或 Llama 的語義判斷能力" in item for item in verification["limitations"]))
+
+    def test_j0_host_diagnosis_keeps_native_crashes_distinct_from_model_ability(self) -> None:
+        record = load_record("j0-host-compatibility-diagnosis.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            J0_HOST_COMPATIBILITY_DIAGNOSIS_REVISION,
+            artifacts["artifact-j0-host-diagnosis-status"]["revision"],
+        )
+
+        projection = project_subject(record, "observation-j0-host-runtime-boundary")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertTrue(any("不證明唯一 root cause" in item for item in verification["limitations"]))
 
 
 if __name__ == "__main__":

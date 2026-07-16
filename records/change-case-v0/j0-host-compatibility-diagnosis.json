@@ -1,0 +1,115 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-j0-host-compatibility-diagnosis",
+  "public_summary": "此變更帳記錄 J0 initial probe 的只讀 host/runtime 後續診斷：三個 transport errors 與三個本機 llama-server native crash events 時間相鄰，而 host 的 Windows 10 build 1903 低於 Ollama 文件列出的 22H2 minimum。它是一個可檢查的 compatibility candidate，不是模型 judge 能力結論。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "observation-j0-host-runtime-boundary",
+      "kind": "observation",
+      "public_summary": "在不新增 generation、download、restart 或 OS 變更的前提下，現有初始 probe 與 host event diagnostics 支持停止此不受支援 build 上的本機 J0 generation，直到擁有者決定外部環境。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-j0-host-diagnosis-status",
+      "kind": "document",
+      "locator": "docs/status/j0-host-compatibility-diagnosis-20260716.md",
+      "revision": "61d3cbd0d1e453d02340e597b01a80c760977171"
+    },
+    {
+      "id": "artifact-j0-initial-probe-status",
+      "kind": "document",
+      "locator": "docs/status/j0-judge-calibration-initial-probe-20260716.md",
+      "revision": "13172a431e5339a5ac7a3d030ae819090e940c51"
+    },
+    {
+      "id": "artifact-j0-initial-probe-record",
+      "kind": "source_file",
+      "locator": "records/change-case-v0/j0-judge-calibration-initial-probe.json",
+      "revision": "39c7b67a33d2b0589d0ba0f5f69db755692bd421"
+    },
+    {
+      "id": "artifact-ollama-windows-requirements",
+      "kind": "external_source",
+      "locator": "https://docs.ollama.com/windows",
+      "revision": "retrieved-2026-07-16"
+    },
+    {
+      "id": "artifact-j0-host-diagnosis-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/61d3cbd0d1e453d02340e597b01a80c760977171",
+      "revision": "61d3cbd0d1e453d02340e597b01a80c760977171"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-j0-host-crash-correlation",
+      "kind": "runtime_observation",
+      "relation": "supports",
+      "subject_refs": ["observation-j0-host-runtime-boundary"],
+      "artifact_refs": ["artifact-j0-host-diagnosis-status", "artifact-j0-initial-probe-status"],
+      "public_summary": "失敗 probe 前後 loopback 的 version、tags 與 ps endpoints 仍可讀取；同時三筆 Application Error 與 WER 事件在數量和時間上對應三次 llama-server native crash。這使子 runner crash 成為比一般 loopback 無法連線更強的解釋。"
+    },
+    {
+      "id": "evidence-j0-host-support-floor",
+      "kind": "source",
+      "relation": "supports",
+      "subject_refs": ["observation-j0-host-runtime-boundary"],
+      "artifact_refs": ["artifact-ollama-windows-requirements", "artifact-j0-host-diagnosis-status"],
+      "public_summary": "供應商 Windows 文件要求 Windows 10 22H2 或更新版本；被診斷的 host build 為 Windows 10 1903。因此觀察到的 host 位於公開支援下限之外。"
+    },
+    {
+      "id": "evidence-j0-host-diagnosis-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["observation-j0-host-runtime-boundary"],
+      "artifact_refs": [
+        "artifact-j0-host-diagnosis-status",
+        "artifact-j0-initial-probe-record",
+        "artifact-j0-host-diagnosis-commit"
+      ],
+      "public_summary": "事件關聯與不受支援的 OS build 指向一個 compatibility candidate，但不是唯一 root cause。本 record 不含 server error body、raw prompt、raw model output、私有路徑、restart、OS update、模型下載或新的 generation。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-j0-host-boundary-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T14:10:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 J0 host/runtime boundary observation，將初始 probe 的無 verdict 結果與後續只讀環境診斷分開保留。",
+      "subject_refs": ["observation-j0-host-runtime-boundary"]
+    },
+    {
+      "id": "event-j0-host-boundary-verified",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T14:10:01Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄 native crash correlation、loopback read-only availability、OS build 與 vendor support floor 的有限診斷；後續環境變更仍需人類決定。",
+      "subject_refs": ["observation-j0-host-runtime-boundary"],
+      "evidence_refs": [
+        "evidence-j0-host-crash-correlation",
+        "evidence-j0-host-support-floor",
+        "evidence-j0-host-diagnosis-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "讀取初始 J0 manifest summary、loopback version/tags/ps、Windows Application and WER event metadata、OS build 與官方 Windows support documentation；未送出新的 generate request。",
+        "scope": "驗證三個既有 transport errors 與三個 native runner crash events 的時間／數量關係，以及已觀察 host build 是否落在 vendor 公開 Windows support floor 之下。",
+        "limitations": [
+          "這個診斷不證明唯一 root cause，也不宣稱 ucrtbase、Ollama version、model 或 prompt 中哪一項必然造成 crash。",
+          "沒有新增模型 verdict，不能判斷 Qwen 或 Llama 的 judge 能力、H1 人類盲評、B0/I1 差異或任何誠實、人格、意識與自我認知性質。"
+        ]
+      }
+    }
+  ]
+}
