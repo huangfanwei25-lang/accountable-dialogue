@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -250,6 +252,20 @@ class JudgeCalibrationTests(unittest.TestCase):
         self.assertEqual("invalid_judge_contract", result.rows[0]["mechanical_status"])
         self.assertEqual("{}", result.rows[0]["raw_response"])
         self.assertEqual([], result.rows[0]["label_comparisons"])
+
+    def test_runner_script_can_render_help_from_the_repository_root(self) -> None:
+        completed = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "run_judge_calibration.py"), "--help"],
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+            encoding="utf-8",
+            text=True,
+            timeout=10,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        self.assertIn("--output-dir", completed.stdout)
 
 
 if __name__ == "__main__":

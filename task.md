@@ -298,6 +298,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 ## Phase 2: Resource-gated local probe
 
 - [x] Commit and push the J0 harness, plan and preparation change case before a live call.
+- [x] Preserve one direct-script preflight launch failure before any model call; its import-path successor must be committed before the probe starts.
 - [ ] Run only the fixed two-packet Qwen probe and one-packet Llama resource probe, with no retry and a 300-second wall-time gate.
 - [ ] Record a bounded result or inconclusive stop without reporting an aggregate judge score.
 **Success criteria**: the repository can distinguish a usable calibration candidate from a format/resource failure without treating either as human judgment.

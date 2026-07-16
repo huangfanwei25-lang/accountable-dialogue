@@ -9,19 +9,23 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
+import sys
 import tempfile
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 
-from accountable_dialogue.judge_calibration import (
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from accountable_dialogue.judge_calibration import (  # noqa: E402
     JudgeCalibrationConfig,
     JudgeCalibrationTarget,
     execute_judge_calibration,
 )
-from accountable_dialogue.local_pilot import LocalOnlyOllamaClient
+from accountable_dialogue.local_pilot import LocalOnlyOllamaClient  # noqa: E402
 
-ROOT = Path(__file__).resolve().parents[1]
 CASES_DIRECTORY = ROOT / "fixtures" / "synthetic-judge-calibration-v0" / "cases"
 INITIAL_PROBE_TARGETS = (
     JudgeCalibrationTarget(case_id="j0-incomplete-withhold", model="qwen2.5:1.5b"),
