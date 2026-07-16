@@ -23,6 +23,7 @@ from accountable_dialogue.synthetic_pilot import (
     validate_annotation_key,
     validate_case,
 )
+from scripts.run_synthetic_pilot import load_cases
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "schemas" / "synthetic-evaluation-case-v0.schema.json"
@@ -67,6 +68,13 @@ class FakeOllamaTransport:
 
 
 class SyntheticPilotTests(unittest.TestCase):
+    def test_case_loader_can_preselect_a_narrow_smoke_scope(self) -> None:
+        selected = load_cases(("h1-incomplete-library-hours",))
+
+        self.assertEqual(["h1-incomplete-library-hours"], [case["case_id"] for case in selected])
+        with self.assertRaisesRegex(ValueError, "unknown case"):
+            load_cases(("case-not-present",))
+
     def test_schema_and_all_fixed_cases_are_public_and_valid(self) -> None:
         schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
         Draft202012Validator.check_schema(schema)

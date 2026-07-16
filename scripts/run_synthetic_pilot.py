@@ -36,6 +36,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--timeout-seconds", type=float, default=120.0)
     parser.add_argument("--max-tokens", type=int, default=360)
     parser.add_argument(
+        "--case-ids",
+        nargs="+",
+        help="Optional fixed subset of case ids for a separately pre-registered smoke test.",
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         help="Optional directory outside the repository. Defaults to an OS temporary directory.",
@@ -48,8 +53,15 @@ def default_output_directory() -> Path:
     return Path(tempfile.gettempdir()) / "accountable-dialogue-pilot" / stamp
 
 
-def load_cases() -> tuple[dict[str, object], ...]:
-    return tuple(json.loads(path.read_text(encoding="utf-8")) for path in sorted(CASES_DIRECTORY.glob("*.json")))
+def load_cases(case_ids: tuple[str, ...] | None = None) -> tuple[dict[str, object], ...]:
+    cases = tuple(json.loads(path.read_text(encoding="utf-8")) for path in sorted(CASES_DIRECTORY.glob("*.json")))
+    if case_ids is None:
+        return cases
+    by_id = {case["case_id"]: case for case in cases}
+    unknown = sorted(set(case_ids) - set(by_id))
+    if unknown:
+        raise ValueError(f"unknown case id: {', '.join(unknown)}")
+    return tuple(by_id[case_id] for case_id in case_ids)
 
 
 def main() -> int:
@@ -63,7 +75,7 @@ def main() -> int:
         timeout_seconds=args.timeout_seconds,
     )
     result = execute_pilot(
-        cases=load_cases(),
+        cases=load_cases(tuple(args.case_ids) if args.case_ids else None),
         client=client,
         config=config,
         output_dir=output_dir,

@@ -187,3 +187,24 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [ ] Inspect output safety and mechanical integrity before selecting any public Artifact.
 - [ ] Record results, non-results or blocked execution with limits in a new change case.
 **Success criteria**: any conclusion is bounded to the run, inputs and models actually observed.
+
+---
+
+## Active Short Board: Local Resource Smoke Test v0 (2026-07-16)
+
+> The full 24-call pilot attempt stopped before a completed response under CPU execution. This is a
+> narrower successor under the existing local-model authorization, not a rewrite of the original run.
+> It measures runner feasibility only and cannot create a behavioral-effect claim.
+
+## Phase 1: Fix the reduced matrix
+
+- [x] Commit the one-case Qwen B0/I1 selection, `num_predict=128`, 90-second timeout and 240-second wall-time gate.
+- [x] Test CLI case selection without calling a real model.
+**Success criteria**: the reduced budget is explicit and cannot be confused with the original 24-call matrix.
+
+## Phase 2: Run and account
+
+- [ ] Confirm the single local model remains installed, then execute exactly two calls.
+- [ ] Inspect temporary raw output and manifest before publishing any summary.
+- [ ] Record the outcome as a separate smoke-test case, including failure or timeout.
+**Success criteria**: no semantic label or model-effect conclusion is made from a resource smoke test.
