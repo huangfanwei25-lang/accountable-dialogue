@@ -1,0 +1,198 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-h1-blind-annotation-preparation",
+  "public_summary": "此變更帳只記錄 H1 盲化語義標註的準備邊界：已建立全合成、條件盲化的封包格式與私有 nonce mapping commitment。它不記錄新的模型執行、標註者招募或評分，也不構成 H1、B0/I1 或模型誠實能力的結果。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-h1-blind-annotation-preparation",
+      "kind": "proposal",
+      "public_summary": "以公開安全的封包與不可由公開資訊枚舉的 mapping commitment，為未來獨立盲化語義標註建立可檢查邊界；任何新鮮輸出、標註收集、解盲或條件比較仍須另行取得人類程序授權。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-h1-blind-annotation-plan",
+      "kind": "document",
+      "locator": "docs/plans/h1-blind-semantic-annotation-pilot-v0.md",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-blind-packet-source",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/blind_annotation.py",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-mapping-commitment-source",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-blind-packet-schema",
+      "kind": "schema",
+      "locator": "schemas/blind-semantic-annotation-packet-v0.schema.json",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-blind-packet-tests",
+      "kind": "test",
+      "locator": "tests/test_blind_annotation.py",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-mapping-commitment-tests",
+      "kind": "test",
+      "locator": "tests/test_synthetic_pilot.py",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    },
+    {
+      "id": "artifact-h1-blind-annotation-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/415e10fe869c16044b6bfa821ef3e49260375d73",
+      "revision": "415e10fe869c16044b6bfa821ef3e49260375d73"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-h1-blind-packet-boundary",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "artifact_refs": [
+        "artifact-h1-blind-annotation-plan",
+        "artifact-h1-blind-packet-source",
+        "artifact-h1-mapping-commitment-source",
+        "artifact-h1-blind-packet-schema"
+      ],
+      "public_summary": "計畫、封包建構器與 Schema 只允許共享的全虛構材料、單筆回應與 case-local rubric 進入盲化封包；它們排除 condition、structured context、模型與 provider metadata。新的 commitment 將高熵私有 nonce 與 canonical mapping 一起雜湊，避免只發布小型 mapping hash 時可被枚舉的問題。"
+    },
+    {
+      "id": "evidence-h1-preparation-checks",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "artifact_refs": [
+        "artifact-h1-blind-packet-source",
+        "artifact-h1-mapping-commitment-source",
+        "artifact-h1-blind-packet-schema",
+        "artifact-h1-blind-packet-tests",
+        "artifact-h1-mapping-commitment-tests"
+      ],
+      "public_summary": "本地測試以假回應驗證配對封包可通過封閉 Schema 與語義檢查、不得夾帶條件或 structured context、無效或未配對輸出會被拒絕，且 nonce commitment 不會將 nonce 或可枚舉 mapping hash 寫入公開 manifest。"
+    },
+    {
+      "id": "evidence-h1-preparation-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "artifact_refs": [
+        "artifact-h1-blind-annotation-plan",
+        "artifact-h1-blind-annotation-commit"
+      ],
+      "public_summary": "本次僅驗證準備用程式與測試。沒有產生新的模型輸出、沒有選擇或聯絡標註者、沒有收集評分、沒有揭露 mapping，亦沒有執行語義正確性、盲化有效性或 B0/I1 條件效果的判定。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-h1-blind-preparation-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T10:36:46Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 H1 盲化語義標註準備 Proposal，讓封包邊界、解盲前提與仍缺少的程序決定可以被分開檢查。",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"]
+    },
+    {
+      "id": "event-h1-blind-preparation-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T10:36:47Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "請求審查的對象是封包與 commitment 準備，而非對模型、標註者或研究效果的預先肯定。",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"]
+    },
+    {
+      "id": "event-h1-blind-preparation-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T10:36:48Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "倉庫擁有者只批准盲化封包與 commitment 的準備工作；沒有批准新鮮 H1 執行、標註收集、mapping 解盲或任何條件效果主張。",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": [
+            "blind_annotation_packet_preparation",
+            "synthetic_only",
+            "no_live_run",
+            "no_rater_collection"
+          ]
+        },
+        "effective_at": "2026-07-16T10:36:48Z"
+      }
+    },
+    {
+      "id": "event-h1-blind-preparation-implemented",
+      "kind": "implementation_reported",
+      "sequence": 4,
+      "recorded_at": "2026-07-16T10:36:49Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "已實作盲化封包 builder 與 validator、封閉 JSON Schema、配對失敗拒絕規則，以及不公開 nonce 的 mapping commitment；它們只處理記憶體中的全合成假回應或未來已授權的資料。",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "全合成、公開安全的盲化 packet 和私有 nonce commitment 基礎設施，包含 Schema 與 fake-response regression coverage。",
+        "limitations": [
+          "沒有新增 live model run、raw output、annotation packet 交付、標註者或評分資料。",
+          "尚未決定兩位獨立標註者、其可見資料與保留方式，故不得將本次實作稱為盲化語義研究。"
+        ]
+      }
+    },
+    {
+      "id": "event-h1-blind-preparation-verified",
+      "kind": "verification_recorded",
+      "sequence": 5,
+      "recorded_at": "2026-07-16T10:36:50Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "本地單元測試、Schema 驗證、lint 與文件連結檢查確認了準備程式的輸入邊界；驗證範圍不延伸到人類標註品質或模型行為。",
+      "subject_refs": ["proposal-h1-blind-annotation-preparation"],
+      "evidence_refs": [
+        "evidence-h1-blind-packet-boundary",
+        "evidence-h1-preparation-checks",
+        "evidence-h1-preparation-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "python -m pytest tests/ -x；python -m ruff check accountable_dialogue tests scripts；本地 Markdown link check；git diff --check",
+        "scope": "驗證封包 shape、隱藏欄位排除、配對與機械有效性 gate、nonce commitment 的公開 manifest 邊界，以及所有目前 repository change case 的結構與語義驗證。",
+        "limitations": [
+          "沒有真實或新鮮的 H1 回應可供判讀，也沒有兩位獨立標註者的已鎖定 verdict。",
+          "因此沒有任何 evidence relevance、語義正確性、盲化是否成功、B0/I1 差異、誠實能力或自我狀態的結論。"
+        ]
+      }
+    }
+  ]
+}

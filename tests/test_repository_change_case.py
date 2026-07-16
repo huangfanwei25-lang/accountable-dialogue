@@ -23,6 +23,7 @@ LOCAL_RESOURCE_SMOKE_V02_CONTRACT_REVISION = "395b6fd2a8d17840ee6360cbe724418740
 LOCAL_RESOURCE_SMOKE_V02_RESULT_REVISION = "a7482601783a927997f178fa65317bb62e8b8af8"
 LOCAL_RESOURCE_SMOKE_V03_CONTRACT_REVISION = "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
 LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION = "bee65f1e03849d18a7173d40b22fa99f57389e05"
+H1_BLIND_ANNOTATION_PREPARATION_REVISION = "415e10fe869c16044b6bfa821ef3e49260375d73"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -282,6 +283,43 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("verified_within_scope", projection.verification)
         self.assertEqual("event-smoke-v03-verified-within-scope", projection.verification_event_id)
+
+    def test_h1_blind_annotation_preparation_stays_limited_to_packet_infrastructure(self) -> None:
+        record = load_record("h1-blind-semantic-annotation-preparation.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        self.assertTrue(
+            all(
+                artifact["revision"] == H1_BLIND_ANNOTATION_PREPARATION_REVISION
+                for artifact in record["artifacts"]
+            )
+        )
+
+        projection = project_subject(record, "proposal-h1-blind-annotation-preparation")
+        self.assertEqual("ratified", projection.governance)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+        self.assertEqual("event-h1-blind-preparation-implemented", projection.implementation_event_id)
+        self.assertEqual("event-h1-blind-preparation-verified", projection.verification_event_id)
+
+        decision = next(event["decision"] for event in record["events"] if event["kind"] == "governance_decided")
+        self.assertEqual("human", decision["made_by"]["kind"])
+        self.assertEqual(
+            [
+                "blind_annotation_packet_preparation",
+                "synthetic_only",
+                "no_live_run",
+                "no_rater_collection",
+            ],
+            decision["authority_basis"]["scope"],
+        )
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertTrue(
+            any("沒有真實或新鮮的 H1 回應" in limitation for limitation in verification["limitations"])
+        )
+        self.assertIn("B0/I1 差異", verification["limitations"][1])
 
 
 if __name__ == "__main__":

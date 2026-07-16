@@ -269,6 +269,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Define a closed blind-packet shape containing shared synthetic material, one response and case-local rubric but no condition mapping or model metadata.
 - [x] Require a high-entropy private mapping nonce commitment instead of a publicly enumerable mapping hash.
 - [x] Test that invalid/unpaired outputs are rejected rather than silently excluded from packetization.
+- [x] Record the limited implementation and verification in `change-case-v0`, without claiming a semantic result.
 **Success criteria**: a future reviewer can see what a rater may judge without seeing which condition generated it.
 
 ## Phase 2: Await procedural authority
