@@ -150,6 +150,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [ ] Owner ratifies, narrows or rejects the research vocabulary and any future data boundary.
 - [x] Draft a reviewable synthetic evaluation protocol without creating an evaluation-case format or evaluator.
 - [x] Record the protocol as an under-review Proposal rather than a model capability or implementation.
+- [x] Separate output-level H4a from untested reader-attribution H4b, and add control fixtures and falsification gates.
 - [ ] Propose a synthetic, low-risk evaluation-case format only after the protocol and research proposal are reviewed.
 - [x] Define candidate baseline, independent-labeling requirements and failure conditions without making an intervention claim.
 - [ ] Pre-register run-specific sample, labels, thresholds and model settings before any actual intervention claim.
