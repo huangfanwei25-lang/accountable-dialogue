@@ -24,6 +24,7 @@ LOCAL_RESOURCE_SMOKE_V02_RESULT_REVISION = "a7482601783a927997f178fa65317bb62e8b
 LOCAL_RESOURCE_SMOKE_V03_CONTRACT_REVISION = "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
 LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION = "bee65f1e03849d18a7173d40b22fa99f57389e05"
 H1_BLIND_ANNOTATION_PREPARATION_REVISION = "415e10fe869c16044b6bfa821ef3e49260375d73"
+J0_JUDGE_CALIBRATION_HARNESS_REVISION = "5d006b3dcefb7a089376a1b362e094a26b27e677"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -320,6 +321,36 @@ class RepositoryChangeCaseTests(unittest.TestCase):
             any("沒有真實或新鮮的 H1 回應" in limitation for limitation in verification["limitations"])
         )
         self.assertIn("B0/I1 差異", verification["limitations"][1])
+
+    def test_j0_judge_calibration_preparation_is_local_only_and_not_a_human_substitute(self) -> None:
+        record = load_record("j0-judge-calibration-preparation.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            J0_JUDGE_CALIBRATION_HARNESS_REVISION,
+            artifacts["artifact-j0-judge-harness-commit"]["revision"],
+        )
+
+        projection = project_subject(record, "proposal-j0-judge-calibration")
+        self.assertEqual("ratified", projection.governance)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+
+        decision = next(event["decision"] for event in record["events"] if event["kind"] == "governance_decided")
+        self.assertEqual(
+            [
+                "synthetic_judge_calibration",
+                "local_model_execution",
+                "no_human_rater_substitution",
+                "no_model_download_initial_probe",
+            ],
+            decision["authority_basis"]["scope"],
+        )
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertTrue(any("沒有執行任何 live model call" in item for item in verification["limitations"]))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,223 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-j0-judge-calibration-preparation",
+  "public_summary": "此變更帳記錄 J0 小模型 judge 校準的準備基礎設施：全虛構 fixture、與 case content 綁定的隱藏 oracle、封閉 verdict contract，以及只連 loopback 且不下載模型的 runner。它不記錄 live model output、human rating、H1 結果或模型的內在性質。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-j0-judge-calibration",
+      "kind": "proposal",
+      "public_summary": "把本機小模型放在受測、可否證的輔助 judge 位置：只在預先固定的合成 calibration cases 上檢查其封閉 label verdict 與引用 anchor；它不代替兩位外部獨立人類的正式 H1 盲評。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-j0-plan",
+      "kind": "document",
+      "locator": "docs/plans/j0-small-model-judge-feasibility-v0.md",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-harness",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/judge_calibration.py",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-local-client",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-case-schema",
+      "kind": "schema",
+      "locator": "schemas/synthetic-judge-calibration-v0.schema.json",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-key-schema",
+      "kind": "schema",
+      "locator": "schemas/synthetic-judge-calibration-key-v0.schema.json",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-verdict-schema",
+      "kind": "schema",
+      "locator": "schemas/judge-verdict-v0.schema.json",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-fixtures",
+      "kind": "source_file",
+      "locator": "fixtures/synthetic-judge-calibration-v0/calibration-key-v0.json",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-runner",
+      "kind": "source_file",
+      "locator": "scripts/run_judge_calibration.py",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-tests",
+      "kind": "test",
+      "locator": "tests/test_judge_calibration.py",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    },
+    {
+      "id": "artifact-j0-judge-harness-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/5d006b3dcefb7a089376a1b362e094a26b27e677",
+      "revision": "5d006b3dcefb7a089376a1b362e094a26b27e677"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-j0-boundary",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "artifact_refs": [
+        "artifact-j0-plan",
+        "artifact-j0-harness",
+        "artifact-j0-local-client",
+        "artifact-j0-case-schema",
+        "artifact-j0-key-schema",
+        "artifact-j0-verdict-schema",
+        "artifact-j0-fixtures",
+        "artifact-j0-runner"
+      ],
+      "public_summary": "J0 fixture 與 key 分離；key 對每個 case 的內容 commitment、expected verdict 與 reference-anchor vector 預先固定，但 renderer 只取得 task、materials、candidate response 與 rubric。runner 只接受 loopback Ollama、已安裝模型、固定資源上限，且將 raw response 和 manifest 寫在 repository 外。"
+    },
+    {
+      "id": "evidence-j0-preparation-checks",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "artifact_refs": [
+        "artifact-j0-harness",
+        "artifact-j0-local-client",
+        "artifact-j0-case-schema",
+        "artifact-j0-key-schema",
+        "artifact-j0-verdict-schema",
+        "artifact-j0-tests"
+      ],
+      "public_summary": "本地假 transport、Schema 與 regression tests 檢查 closed JSON、case/key commitment、隱藏 oracle 與 anchor 不進 prompt、既存但無關的引用不算 calibration match、loopback-only、output isolation、固定 resource limits，以及 invalid output 保留而非自動修正。"
+    },
+    {
+      "id": "evidence-j0-no-result",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "artifact_refs": [
+        "artifact-j0-plan",
+        "artifact-j0-runner",
+        "artifact-j0-judge-harness-commit"
+      ],
+      "public_summary": "這筆帳只涵蓋已提交的準備程式與驗證。尚未呼叫 Qwen 或 Llama，未下載任何模型，未產生 raw output，未收集兩位人類 verdict，也沒有 H1、B0/I1、真實世界真值、誠實、人格、意識或自我認知結論。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-j0-calibration-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T13:52:13Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 J0 judge calibration Proposal，使模型輔助評審、人類正式盲評與 owner-aligned advisory 能保留為不同的證據軌道。",
+      "subject_refs": ["proposal-j0-judge-calibration"]
+    },
+    {
+      "id": "event-j0-calibration-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T13:52:14Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "審查對象是合成 calibration harness 的邊界與可驗證性，而不是預先認定小模型有語義判斷能力。",
+      "subject_refs": ["proposal-j0-judge-calibration"]
+    },
+    {
+      "id": "event-j0-calibration-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T13:52:15Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "倉庫擁有者批准以既有本機小模型進行合成 J0 calibration 的準備與後續固定初始 probe；兩位外部獨立人類仍保留為正式 H1 盲評者，初始 probe 不下載模型。",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": [
+            "synthetic_judge_calibration",
+            "local_model_execution",
+            "no_human_rater_substitution",
+            "no_model_download_initial_probe"
+          ]
+        },
+        "effective_at": "2026-07-16T13:52:15Z"
+      }
+    },
+    {
+      "id": "event-j0-calibration-implemented",
+      "kind": "implementation_reported",
+      "sequence": 4,
+      "recorded_at": "2026-07-16T13:52:16Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "已實作並公開固定 J0 fixture/key、case commitment、隱藏 label-anchor 比對、JSON validator、local-only runner、prompt digest manifest 與 fake-transport tests。",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "只處理全虛構、低風險、可逆 J0 packet 的校準基礎設施；每次 generation 使用新的 context，無 retry、無 pull、無公開 raw output 步驟。",
+        "limitations": [
+          "沒有執行任何 live model call、沒有生成或公開 raw output，也沒有下載模型。",
+          "J0 的模型 judge 只能是受測輔助工具，不能代替兩位外部獨立人類的正式 H1 盲評。",
+          "固定 oracle 只能比較封閉合成題目的 verdict 與引用 anchor，不能證明一般語義理解或模型內在狀態。"
+        ]
+      }
+    },
+    {
+      "id": "event-j0-calibration-verified",
+      "kind": "verification_recorded",
+      "sequence": 5,
+      "recorded_at": "2026-07-16T13:52:17Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "本地 tests、lint、Schema fixture checks 與 staged-diff check 驗證了 J0 準備程式的結構、資源與資料邊界；驗證不延伸到任何模型的實際輸出或語義能力。",
+      "subject_refs": ["proposal-j0-judge-calibration"],
+      "evidence_refs": [
+        "evidence-j0-boundary",
+        "evidence-j0-preparation-checks",
+        "evidence-j0-no-result"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "python -m pytest tests/ -x；python -m ruff check accountable_dialogue tests scripts；J0 Schema fixture validation；git diff --check。",
+        "scope": "驗證 fixture/key 的封閉形狀、case/key digest commitment、prompt 的 oracle 排除、anchor exact-match、local loopback 與已安裝模型 gate、raw output repository 外寫入及固定的 token、timeout、wall-time 上限。",
+        "limitations": [
+          "沒有執行任何 live model call，故尚無 Qwen 或 Llama 的 J0 result、timeout observation 或資源結論。",
+          "沒有兩位外部獨立人類的已鎖定 H1 verdict；因此不推論人類分歧、H1 語義比較、B0/I1 差異、真實世界真值，或模型的誠實、人格、意識與自我認知。"
+        ]
+      }
+    }
+  ]
+}
