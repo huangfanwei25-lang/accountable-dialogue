@@ -11,6 +11,7 @@ from jsonschema import Draft202012Validator
 from accountable_dialogue.local_pilot import (
     LocalOnlyOllamaClient,
     PilotExecutionConfig,
+    condition_mapping_commitment,
     execute_pilot,
     validate_loopback_base_url,
 )
@@ -240,6 +241,8 @@ class SyntheticPilotTests(unittest.TestCase):
             self.assertEqual({"A", "B"}, {row["condition_alias"] for row in result.rows})
             self.assertTrue(all(row["mechanical_status"] == "valid" for row in result.rows))
             self.assertEqual(RESPONSE_CONTRACT_VERSION, result.manifest["response_contract_version"])
+            self.assertIn("condition_mapping_sha256", result.manifest)
+            self.assertNotIn("condition_mapping_commitment", result.manifest)
 
         generation_payloads = [payload for _, url, payload, _ in transport.requests if url.endswith("/api/generate")]
         self.assertEqual(2, len(generation_payloads))
@@ -275,6 +278,40 @@ class SyntheticPilotTests(unittest.TestCase):
             )
 
         self.assertEqual({"invalid_json", "invalid_response_object"}, {row["mechanical_status"] for row in result.rows})
+
+    def test_blind_mapping_commitment_hides_the_nonce_and_mapping_digest_from_manifest(self) -> None:
+        case = load_case("h1-incomplete-library-hours.json")
+        transport = FakeOllamaTransport()
+        client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=transport)
+        nonce = "n" * 32
+        config = PilotExecutionConfig(
+            models=("tiny-a:latest",),
+            timeout_seconds=3,
+            max_tokens=80,
+            blind_mapping_nonce=nonce,
+        )
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            output_dir = Path(temporary_directory) / "pilot-output"
+            result = execute_pilot(
+                cases=(case,),
+                client=client,
+                config=config,
+                output_dir=output_dir,
+                repository_root=ROOT,
+            )
+            mapping = json.loads((output_dir / "condition-mapping.json").read_text(encoding="utf-8"))["mapping"]
+
+        self.assertNotIn("condition_mapping_sha256", result.manifest)
+        self.assertNotIn(nonce, json.dumps(result.manifest, ensure_ascii=False))
+        self.assertEqual(
+            condition_mapping_commitment(nonce, mapping),
+            result.manifest["condition_mapping_commitment"],
+        )
+        self.assertEqual("nonce_plus_canonical_mapping_sha256", result.manifest["condition_mapping_commitment_scheme"])
+
+        with self.assertRaisesRegex(ValueError, "at least 32"):
+            PilotExecutionConfig(models=("tiny-a:latest",), blind_mapping_nonce="too-short")
 
     def test_runner_rejects_bracketed_and_non_evidence_material_ids(self) -> None:
         case = load_case("h1-incomplete-library-hours.json")

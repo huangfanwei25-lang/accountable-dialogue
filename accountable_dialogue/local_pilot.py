@@ -85,6 +85,7 @@ class PilotExecutionConfig:
     context_tokens: int = 4096
     max_tokens: int = 360
     timeout_seconds: float = 120.0
+    blind_mapping_nonce: str | None = None
 
     def __post_init__(self) -> None:
         if not self.models or any(not model.strip() for model in self.models):
@@ -93,6 +94,10 @@ class PilotExecutionConfig:
             raise ValueError("pilot v0 fixes temperature at 0")
         if self.context_tokens < 512 or self.max_tokens < 1 or self.timeout_seconds <= 0:
             raise ValueError("pilot execution limits must be positive and bounded")
+        if self.blind_mapping_nonce is not None and (
+            len(self.blind_mapping_nonce) < 32 or any(character.isspace() for character in self.blind_mapping_nonce)
+        ):
+            raise ValueError("blind mapping nonce must be at least 32 non-whitespace characters")
 
 
 @dataclass(frozen=True)
@@ -210,15 +215,19 @@ def execute_pilot(
         raise FileExistsError(f"pilot output directory already exists: {output_dir}")
     output_dir.mkdir(parents=True)
 
-    rng = random.Random(config.seed)
-    mappings = _build_condition_mappings(normalized_cases, rng)
+    if config.blind_mapping_nonce is None:
+        ordering_rng = random.Random(config.seed)
+        mappings = _build_condition_mappings(normalized_cases, ordering_rng)
+    else:
+        mappings = _build_condition_mappings(normalized_cases, _mapping_random(config))
+        ordering_rng = random.Random(config.seed)
     plan: list[tuple[Mapping[str, Any], str, str, str]] = []
     for case in normalized_cases:
         mapping = mappings[case["case_id"]]
         for model in config.models:
             for alias in ("A", "B"):
                 plan.append((case, model, alias, mapping[alias]))
-    rng.shuffle(plan)
+    ordering_rng.shuffle(plan)
 
     rows: list[dict[str, object]] = []
     for case, model, alias, condition in plan:
@@ -248,8 +257,6 @@ def execute_pilot(
         "format": "accountable-dialogue/synthetic-pilot-condition-mapping-v0",
         "mapping": mappings,
     }
-    mapping_bytes = json.dumps(mapping_payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
-    mapping_digest = hashlib.sha256(mapping_bytes).hexdigest()
     manifest = {
         "format": "accountable-dialogue/synthetic-pilot-run-manifest-v0",
         "created_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
@@ -262,11 +269,19 @@ def execute_pilot(
             "timeout_seconds": config.timeout_seconds,
         },
         "case_digests": {case["case_id"]: _canonical_digest(case) for case in normalized_cases},
-        "condition_mapping_sha256": mapping_digest,
         "response_contract_version": RESPONSE_CONTRACT_VERSION,
         "response_count": len(rows),
         "raw_outputs_publication": "not_reviewed",
     }
+    if config.blind_mapping_nonce is None:
+        mapping_bytes = json.dumps(mapping_payload, ensure_ascii=False, sort_keys=True).encode("utf-8")
+        manifest["condition_mapping_sha256"] = hashlib.sha256(mapping_bytes).hexdigest()
+    else:
+        manifest["condition_mapping_commitment"] = condition_mapping_commitment(
+            config.blind_mapping_nonce,
+            mappings,
+        )
+        manifest["condition_mapping_commitment_scheme"] = "nonce_plus_canonical_mapping_sha256"
     _write_json_lines(output_dir / "blind-responses.jsonl", rows)
     _write_json(output_dir / "condition-mapping.json", mapping_payload)
     _write_json(output_dir / "run-manifest.json", manifest)
@@ -323,6 +338,21 @@ def _build_condition_mappings(
         else:
             mappings[case["case_id"]] = {"A": "I1_structured_context", "B": "B0_baseline"}
     return mappings
+
+
+def condition_mapping_commitment(nonce: str, mapping: Mapping[str, Mapping[str, str]]) -> str:
+    """Commit to a private mapping without putting its nonce in a manifest."""
+
+    payload = {"nonce": nonce, "mapping": mapping}
+    encoded = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _mapping_random(config: PilotExecutionConfig) -> random.Random:
+    if config.blind_mapping_nonce is None:
+        return random.Random(config.seed)
+    digest = hashlib.sha256(config.blind_mapping_nonce.encode("utf-8")).digest()
+    return random.Random(int.from_bytes(digest, byteorder="big"))
 
 
 def _mechanical_response_status(raw_response: str, material_ids: Sequence[str], case: Mapping[str, Any]) -> str:

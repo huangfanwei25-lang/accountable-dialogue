@@ -133,6 +133,12 @@ def annotation_key_digest(path: Path) -> str:
     """Return a line-ending-independent SHA-256 commitment for a JSON key."""
 
     value = json.loads(path.read_text(encoding="utf-8"))
+    return canonical_json_digest(value)
+
+
+def canonical_json_digest(value: object) -> str:
+    """Return a stable digest for a public JSON-compatible value."""
+
     encoded = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 

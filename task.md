@@ -254,3 +254,26 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Inspect temporary output and manifest before selecting synthetic-only public Artifacts; all released content is fully fictional and public-safe.
 - [x] Record the separate v0.3 result as a reference-syntax verification, without a semantic label or B0/I1 effect claim.
 **Success criteria**: v0.3 stays attributable to its own revision and does not turn reference syntax into a claim of semantic correctness.
+
+---
+
+## Active Short Board: H1 Blind Semantic Annotation Preparation v0 (2026-07-16)
+
+> Owner accepted preparation of a blind semantic-annotation direction after the v0.3 syntax smoke.
+> This board authorizes only public-safe packet and commitment infrastructure. It does not authorize
+> a new live run, choosing or contacting annotators, collecting ratings, exposing a mapping, or claiming
+> an H1/B0/I1 result.
+
+## Phase 1: Fix the blind data boundary
+
+- [x] Define a closed blind-packet shape containing shared synthetic material, one response and case-local rubric but no condition mapping or model metadata.
+- [x] Require a high-entropy private mapping nonce commitment instead of a publicly enumerable mapping hash.
+- [x] Test that invalid/unpaired outputs are rejected rather than silently excluded from packetization.
+**Success criteria**: a future reviewer can see what a rater may judge without seeing which condition generated it.
+
+## Phase 2: Await procedural authority
+
+- [ ] Owner chooses whether two independent annotators can be used and what they may see or retain.
+- [ ] Owner chooses whether to authorize a fresh H1 four-response run under the frozen protocol.
+- [ ] Only then create a run-specific change case, packetize outputs, collect independent verdicts and reveal the mapping.
+**Success criteria**: no semantic comparison happens without an independently reviewable process and an explicit human decision.
