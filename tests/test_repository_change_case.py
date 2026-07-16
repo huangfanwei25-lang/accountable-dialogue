@@ -17,6 +17,7 @@ PROTOCOL_REFINEMENT_REVISION = "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
 EVALUATION_CASE_DESIGN_REVISION = "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
 SMALL_MODEL_PILOT_PLAN_REVISION = "790663cf9929e2d3ff28c24d271c477d6a110013"
 SMALL_MODEL_PILOT_HARNESS_REVISION = "625356bad1db84a2627854fe702109437b58d948"
+SMALL_MODEL_PILOT_ATTEMPT_REVISION = "b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -153,6 +154,23 @@ class RepositoryChangeCaseTests(unittest.TestCase):
             ["synthetic_pilot", "local_model_execution"],
             decision["authority_basis"]["scope"],
         )
+
+    def test_inconclusive_pilot_attempt_preserves_a_resource_limit_without_model_claims(self) -> None:
+        record = load_record("synthetic-small-model-pilot-attempt-one.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            SMALL_MODEL_PILOT_ATTEMPT_REVISION,
+            artifacts["artifact-pilot-attempt-status"]["revision"],
+        )
+
+        projection = project_subject(record, "observation-pilot-resource-boundary")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("inconclusive", projection.verification)
+        self.assertEqual("event-pilot-attempt-inconclusive", projection.verification_event_id)
 
 
 if __name__ == "__main__":

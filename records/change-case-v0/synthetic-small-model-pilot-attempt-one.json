@@ -1,0 +1,93 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-synthetic-small-model-pilot-attempt-one",
+  "public_summary": "記錄第一次 live 小模型 pilot 因 CPU 資源比例不佳而在任何完成 response 前停止；這是一筆執行可行性觀察，不是模型行為或效果結果。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "observation-pilot-resource-boundary",
+      "kind": "observation",
+      "public_summary": "固定 24×360-token B0／I1 matrix 在本機 CPU execution 路徑上，數分鐘內沒有回傳完成 response，因此不能形成可用的模型比較。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-pilot-attempt-status",
+      "kind": "document",
+      "locator": "docs/status/synthetic-pilot-attempt-20260716.md",
+      "revision": "b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4"
+    },
+    {
+      "id": "artifact-pilot-harness-source",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "625356bad1db84a2627854fe702109437b58d948"
+    },
+    {
+      "id": "artifact-pilot-plan",
+      "kind": "document",
+      "locator": "docs/plans/synthetic-small-model-pilot-v0.md",
+      "revision": "790663cf9929e2d3ff28c24d271c477d6a110013"
+    },
+    {
+      "id": "artifact-pilot-attempt-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4",
+      "revision": "b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-pilot-attempt-runtime-limit",
+      "kind": "runtime_observation",
+      "relation": "limits",
+      "subject_refs": ["observation-pilot-resource-boundary"],
+      "artifact_refs": ["artifact-pilot-attempt-status", "artifact-pilot-harness-source", "artifact-pilot-plan"],
+      "public_summary": "本機 loopback Ollama 載入兩個 target，但在 CPU execution 下等待數分鐘仍無完成 response；runner 在寫入任何 raw output 前被停止。此觀察限制完整 matrix 的可行性，不支持模型語義結論。"
+    },
+    {
+      "id": "evidence-pilot-attempt-no-result",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["observation-pilot-resource-boundary"],
+      "artifact_refs": ["artifact-pilot-attempt-status", "artifact-pilot-attempt-commit"],
+      "public_summary": "沒有完成 response、blind package、語義標註、aggregate 指標或公開 raw output，因此不能比較 B0 與 I1，也不能將中止解讀為任一模型失敗。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-pilot-attempt-observation-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T05:45:51Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立第一次執行嘗試的資源觀察；時間是事後帳本記錄時間，不是假裝保存所有 runtime 細節。",
+      "subject_refs": ["observation-pilot-resource-boundary"]
+    },
+    {
+      "id": "event-pilot-attempt-inconclusive",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T05:45:52Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄 execution feasibility 為未定論：run 在任何完成 response 前停止，不能評估或比較模型輸出。",
+      "subject_refs": ["observation-pilot-resource-boundary"],
+      "evidence_refs": ["evidence-pilot-attempt-runtime-limit", "evidence-pilot-attempt-no-result"],
+      "verification": {
+        "outcome": "inconclusive",
+        "method": "本機 loopback Ollama 啟動固定 matrix 並觀察 runner 是否收到完成 response。",
+        "scope": "只涵蓋此機器、此 CPU execution 路徑、兩個已載入模型與固定 24×360-token 設定。",
+        "limitations": [
+          "沒有完成模型輸出、延遲分布、token 統計或語義判讀。",
+          "不推論模型能力、GPU 可用性、其他硬體、其他設定或完整 pilot 的最終可行性。"
+        ]
+      }
+    }
+  ]
+}
