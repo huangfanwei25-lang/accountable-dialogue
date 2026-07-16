@@ -299,13 +299,13 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 - [x] Commit and push the J0 harness, plan and preparation change case before a live call.
 - [x] Preserve one direct-script preflight launch failure before any model call; its import-path successor must be committed before the probe starts.
-- [ ] Run only the fixed two-packet Qwen probe and one-packet Llama resource probe, with no retry and a 300-second wall-time gate.
-- [ ] Record a bounded result or inconclusive stop without reporting an aggregate judge score.
+- [x] Run the fixed two-packet Qwen probe and one-packet Llama resource probe once; all three ended as `transport_error`, with no retry and no verdict.
+- [x] Record the bounded inconclusive result without reporting an aggregate judge score.
 **Success criteria**: the repository can distinguish a usable calibration candidate from a format/resource failure without treating either as human judgment.
 
 ## Phase 3: Decide whether any extra model is warranted
 
-- [ ] Do not download before the initial probe.
+- [x] Do not download before the initial probe.
 - [ ] If needed, consider only the fixed official Ollama Qwen3 tag after source, digest, local-only and scan checks.
 - [ ] Keep any extra model on a one-packet synthetic probe until its own result is separately accounted for.
 **Success criteria**: convenience never expands the trust or supply-chain boundary silently.
