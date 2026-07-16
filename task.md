@@ -252,5 +252,5 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 - [x] Verify `qwen2.5:1.5b` remains locally installed, then execute exactly two calls; both met the v0.3 reference-envelope gate.
 - [x] Inspect temporary output and manifest before selecting synthetic-only public Artifacts; all released content is fully fictional and public-safe.
-- [ ] Record a separate v0.3 result, including any timeout or contract failure, without a semantic label or B0/I1 effect claim.
+- [x] Record the separate v0.3 result as a reference-syntax verification, without a semantic label or B0/I1 effect claim.
 **Success criteria**: v0.3 stays attributable to its own revision and does not turn reference syntax into a claim of semantic correctness.

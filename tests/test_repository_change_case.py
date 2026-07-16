@@ -21,6 +21,8 @@ SMALL_MODEL_PILOT_ATTEMPT_REVISION = "b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4"
 LOCAL_RESOURCE_SMOKE_REVISION = "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
 LOCAL_RESOURCE_SMOKE_V02_CONTRACT_REVISION = "395b6fd2a8d17840ee6360cbe72441874021abcf"
 LOCAL_RESOURCE_SMOKE_V02_RESULT_REVISION = "a7482601783a927997f178fa65317bb62e8b8af8"
+LOCAL_RESOURCE_SMOKE_V03_CONTRACT_REVISION = "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION = "bee65f1e03849d18a7173d40b22fa99f57389e05"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -248,6 +250,38 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("inconclusive", projection.verification)
         self.assertEqual("event-smoke-v02-inconclusive", projection.verification_event_id)
+
+    def test_v03_resource_smoke_limits_verification_to_reference_envelope_syntax(self) -> None:
+        record = load_record("synthetic-local-resource-smoke-v0.3-result.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION, artifacts["artifact-smoke-v03-status"]["revision"])
+        self.assertEqual(LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION, artifacts["artifact-smoke-v03-responses"]["revision"])
+        for artifact_id in (
+            "artifact-smoke-v03-plan",
+            "artifact-smoke-v03-fixture",
+            "artifact-smoke-v03-renderer",
+            "artifact-smoke-v03-validator",
+            "artifact-smoke-v03-tests",
+        ):
+            self.assertEqual(LOCAL_RESOURCE_SMOKE_V03_CONTRACT_REVISION, artifacts[artifact_id]["revision"])
+
+        verification_event = next(
+            event for event in record["events"] if event["id"] == "event-smoke-v03-verified-within-scope"
+        )
+        self.assertEqual("verified_within_scope", verification_event["verification"]["outcome"])
+        self.assertIn(
+            "不推論 H1 回答真值、B0／I1 差異、structured context 效果，或模型的知識邊界、誠實、人格、意識與內在狀態。",
+            verification_event["verification"]["limitations"],
+        )
+
+        projection = project_subject(record, "observation-smoke-v03-reference-envelope")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+        self.assertEqual("event-smoke-v03-verified-within-scope", projection.verification_event_id)
 
 
 if __name__ == "__main__":

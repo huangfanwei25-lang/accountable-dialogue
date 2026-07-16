@@ -1,0 +1,137 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-local-resource-smoke-v03-20260716",
+  "public_summary": "記錄 v0.3 Qwen 單 case B0／I1 資源 smoke：兩個合成 response 在時間門檻內通過非空、精確的 reference-envelope gate；這只驗證語法可追溯性，不形成 H1、B0／I1 或模型內在性質結論。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "observation-smoke-v03-reference-envelope",
+      "kind": "observation",
+      "public_summary": "在固定 Qwen、虛構 H1 case 與 v0.3 response contract 下，兩個完成 response 都含允許的非空 evidence id 與合法的 prior_claim_ref；這是 reference syntax 的範圍 observation。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-smoke-v03-status",
+      "kind": "document",
+      "locator": "docs/status/synthetic-resource-smoke-v0.3-20260716.md",
+      "revision": "bee65f1e03849d18a7173d40b22fa99f57389e05"
+    },
+    {
+      "id": "artifact-smoke-v03-manifest",
+      "kind": "source_file",
+      "locator": "artifacts/synthetic-pilot-v0/smoke-v03-20260716T0613Z/run-manifest.json",
+      "revision": "bee65f1e03849d18a7173d40b22fa99f57389e05"
+    },
+    {
+      "id": "artifact-smoke-v03-responses",
+      "kind": "source_file",
+      "locator": "artifacts/synthetic-pilot-v0/smoke-v03-20260716T0613Z/public-responses.json",
+      "revision": "bee65f1e03849d18a7173d40b22fa99f57389e05"
+    },
+    {
+      "id": "artifact-smoke-v03-plan",
+      "kind": "document",
+      "locator": "docs/plans/synthetic-local-resource-smoke-v0.3.md",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-fixture",
+      "kind": "source_file",
+      "locator": "fixtures/synthetic-pilot-v0/cases/h1-incomplete-library-hours.json",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-renderer",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/synthetic_pilot.py",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-validator",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-tests",
+      "kind": "test",
+      "locator": "tests/test_synthetic_pilot.py",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-contract-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/36bd455c3171b82934b0f4fdb7efd176e3405e2a",
+      "revision": "36bd455c3171b82934b0f4fdb7efd176e3405e2a"
+    },
+    {
+      "id": "artifact-smoke-v03-result-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/bee65f1e03849d18a7173d40b22fa99f57389e05",
+      "revision": "bee65f1e03849d18a7173d40b22fa99f57389e05"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-smoke-v03-execution",
+      "kind": "runtime_observation",
+      "relation": "supports",
+      "subject_refs": ["observation-smoke-v03-reference-envelope"],
+      "artifact_refs": ["artifact-smoke-v03-manifest", "artifact-smoke-v03-responses", "artifact-smoke-v03-status"],
+      "public_summary": "固定 Qwen、case digest、128-token 設定的兩個 response 在約 69 秒內完成，兩筆 mechanical_status 都是 valid，且公開 output 含非空 evidence_refs。"
+    },
+    {
+      "id": "evidence-smoke-v03-reference-contract",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["observation-smoke-v03-reference-envelope"],
+      "artifact_refs": ["artifact-smoke-v03-fixture", "artifact-smoke-v03-renderer", "artifact-smoke-v03-validator", "artifact-smoke-v03-tests"],
+      "public_summary": "v0.3 renderer 對 B0 與 I1 共用非空 exact evidence-id 與 exact-or-not-applicable claim-reference instruction；validator 保留 invalid raw response 並檢查相同邊界。"
+    },
+    {
+      "id": "evidence-smoke-v03-semantic-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["observation-smoke-v03-reference-envelope"],
+      "artifact_refs": ["artifact-smoke-v03-plan", "artifact-smoke-v03-responses", "artifact-smoke-v03-status", "artifact-smoke-v03-result-commit"],
+      "public_summary": "condition mapping 在 output completion 後才公開，沒有盲評、獨立標註或 aggregate score；精確 reference syntax 不能被當成 evidence relevance、H1 真值或 B0／I1 比較結果。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-smoke-v03-observation-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T06:16:42Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 v0.3 reference-envelope observation；只保留可公開的合成 Artifact 與固定 revision，不保存私有本機脈絡。",
+      "subject_refs": ["observation-smoke-v03-reference-envelope"]
+    },
+    {
+      "id": "event-smoke-v03-verified-within-scope",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T06:16:43Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄 v0.3 的兩呼叫 execution 與非空 exact reference envelope 已在固定範圍內驗證；沒有進行語義或 condition-effect 評估。",
+      "subject_refs": ["observation-smoke-v03-reference-envelope"],
+      "evidence_refs": ["evidence-smoke-v03-execution", "evidence-smoke-v03-reference-contract", "evidence-smoke-v03-semantic-limit"],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "固定一 case、兩 condition、單一本機 Qwen 的 128-token loopback smoke；檢查 JSON envelope、非空 exact evidence refs 與 exact-or-not-applicable prior claim reference。",
+        "scope": "只涵蓋 manifest 所列模型、case digest、設定、response-contract revision 與兩個 output 的 reference syntax。",
+        "limitations": [
+          "沒有驗證 evidence 是否支持 conclusion，沒有語義盲評、獨立標註、完整 matrix 或第二模型重複。",
+          "不推論 H1 回答真值、B0／I1 差異、structured context 效果，或模型的知識邊界、誠實、人格、意識與內在狀態。"
+        ]
+      }
+    }
+  ]
+}
