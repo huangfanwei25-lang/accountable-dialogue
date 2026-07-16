@@ -1,0 +1,129 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-j0-judge-calibration-launch-fix",
+  "public_summary": "此變更帳保留 J0 runner 的一次直接啟動 preflight failure 及其最小修正：在任何模型呼叫之前，CLI 找不到本地 package 而停止；後繼修正讓直接腳本入口可載入，並以 subprocess help test 固定。這不是模型 retry 或 J0 calibration result。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-j0-direct-launch-fix",
+      "kind": "proposal",
+      "public_summary": "讓已固定的 J0 local-only runner 能從 repository root 直接執行，同時保留先前零 generation 的 preflight failure，不把它重寫成模型或語義觀察。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-j0-launch-status",
+      "kind": "document",
+      "locator": "docs/status/j0-judge-calibration-launch-attempt-20260716.md",
+      "revision": "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+    },
+    {
+      "id": "artifact-j0-launch-runner",
+      "kind": "source_file",
+      "locator": "scripts/run_judge_calibration.py",
+      "revision": "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+    },
+    {
+      "id": "artifact-j0-launch-tests",
+      "kind": "test",
+      "locator": "tests/test_judge_calibration.py",
+      "revision": "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+    },
+    {
+      "id": "artifact-j0-launch-fix-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/c41df420f76e667b9bb6437f965a85e1bba4e9ce",
+      "revision": "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-j0-launch-preflight",
+      "kind": "runtime_observation",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-direct-launch-fix"],
+      "artifact_refs": ["artifact-j0-launch-status"],
+      "public_summary": "直接執行 J0 script 時，Python 在 runner import 階段停止，尚未進入 main、建立 client、建構 output directory 或發出 Ollama request。此時沒有模型產物可評比。"
+    },
+    {
+      "id": "evidence-j0-launch-fix-check",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-direct-launch-fix"],
+      "artifact_refs": ["artifact-j0-launch-runner", "artifact-j0-launch-tests"],
+      "public_summary": "runner 將 repository root 加入其 direct-script import path；subprocess regression test 從 repository root 執行 --help，確認入口可載入而不呼叫模型。"
+    },
+    {
+      "id": "evidence-j0-launch-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-j0-direct-launch-fix"],
+      "artifact_refs": [
+        "artifact-j0-launch-status",
+        "artifact-j0-launch-runner",
+        "artifact-j0-launch-fix-commit"
+      ],
+      "public_summary": "此次修正只覆蓋 Python CLI import path。它沒有變更 J0 case、hidden oracle、模型清單、token 或 timeout 預算；先前 failure 及修正後的 --help 都不構成 Qwen、Llama 或人類評審能力結果。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-j0-launch-fix-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T13:57:11Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 J0 direct-launch fix Proposal，將 preflight failure、修正與尚未開始的模型 probe 分開記錄。",
+      "subject_refs": ["proposal-j0-direct-launch-fix"]
+    },
+    {
+      "id": "event-j0-launch-fix-implemented",
+      "kind": "implementation_reported",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T13:57:12Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "已加入 direct-script import path bootstrap 與 --help subprocess regression test；這是程序入口修正，不改變 J0 semantic oracle 或模型呼叫計畫。",
+      "subject_refs": ["proposal-j0-direct-launch-fix"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "只讓 scripts/run_judge_calibration.py 在 repository root 直接由 Python 執行時能找到本機 package。",
+        "limitations": [
+          "沒有執行 Qwen 或 Llama generation，沒有建立 J0 output directory，也沒有下載模型。",
+          "沒有改變固定三次 probe 的 case 順序、模型名稱、token、timeout、wall-time 或 no-retry 邊界。"
+        ]
+      }
+    },
+    {
+      "id": "event-j0-launch-fix-verified",
+      "kind": "verification_recorded",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T13:57:13Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "subprocess --help、J0 unit tests、完整 repository tests、lint 與 diff check 驗證 direct-script entrypoint 修正的範圍。",
+      "subject_refs": ["proposal-j0-direct-launch-fix"],
+      "evidence_refs": [
+        "evidence-j0-launch-preflight",
+        "evidence-j0-launch-fix-check",
+        "evidence-j0-launch-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "python scripts/run_judge_calibration.py --help；python -m pytest tests/ -x；python -m ruff check accountable_dialogue tests scripts；git diff --check。",
+        "scope": "驗證 direct CLI import path 與不呼叫模型的 help entrypoint，並回歸驗證現有的 fixture、validator、record 和 local-only boundary。",
+        "limitations": [
+          "沒有 Qwen 或 Llama output、timeout、resource observation 或 J0 label comparison。",
+          "不推論模型是否可作 judge、H1 人類盲評、B0/I1 差異、真實世界事實，或任何誠實、人格、意識與自我認知性質。"
+        ]
+      }
+    }
+  ]
+}

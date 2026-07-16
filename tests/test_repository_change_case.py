@@ -25,6 +25,7 @@ LOCAL_RESOURCE_SMOKE_V03_CONTRACT_REVISION = "36bd455c3171b82934b0f4fdb7efd176e3
 LOCAL_RESOURCE_SMOKE_V03_RESULT_REVISION = "bee65f1e03849d18a7173d40b22fa99f57389e05"
 H1_BLIND_ANNOTATION_PREPARATION_REVISION = "415e10fe869c16044b6bfa821ef3e49260375d73"
 J0_JUDGE_CALIBRATION_HARNESS_REVISION = "5d006b3dcefb7a089376a1b362e094a26b27e677"
+J0_JUDGE_CALIBRATION_LAUNCH_FIX_REVISION = "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -351,6 +352,27 @@ class RepositoryChangeCaseTests(unittest.TestCase):
 
         verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
         self.assertTrue(any("沒有執行任何 live model call" in item for item in verification["limitations"]))
+
+    def test_j0_launch_fix_preserves_preflight_failure_without_a_model_result(self) -> None:
+        record = load_record("j0-judge-calibration-launch-fix.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertTrue(
+            all(
+                artifact["revision"] == J0_JUDGE_CALIBRATION_LAUNCH_FIX_REVISION
+                for artifact in artifacts.values()
+            )
+        )
+
+        projection = project_subject(record, "proposal-j0-direct-launch-fix")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertTrue(any("沒有 Qwen 或 Llama output" in item for item in verification["limitations"]))
 
 
 if __name__ == "__main__":
