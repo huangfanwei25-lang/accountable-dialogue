@@ -8,6 +8,11 @@
       "id": "proposal-synthetic-evaluation-protocol",
       "kind": "proposal",
       "public_summary": "以 B0 baseline 與 I1 structured context 的等價合成案例，定義知識邊界、修正完整性與權限紀律的未來評估條件。"
+    },
+    {
+      "id": "proposal-synthetic-evaluation-protocol-v2",
+      "kind": "proposal",
+      "public_summary": "將輸出聲稱 H4a 與讀者歸因 H4b 分離，加入 12 個候選控制 fixtures、共同回覆 envelope 與明確 falsification gates。"
     }
   ],
   "artifacts": [
@@ -28,6 +33,18 @@
       "kind": "external_source",
       "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/c9d43c52320c90d598e5ad899c51416c091cb880",
       "revision": "c9d43c52320c90d598e5ad899c51416c091cb880"
+    },
+    {
+      "id": "artifact-synthetic-protocol-v2",
+      "kind": "document",
+      "locator": "docs/research/synthetic-evaluation-protocol-v0.md",
+      "revision": "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
+    },
+    {
+      "id": "artifact-protocol-refinement-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/eacb0b8b4f872b6e56283eef2de34e682cfa414a",
+      "revision": "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
     }
   ],
   "evidence": [
@@ -46,6 +63,22 @@
       "subject_refs": ["proposal-synthetic-evaluation-protocol"],
       "artifact_refs": ["artifact-synthetic-protocol", "artifact-protocol-commit"],
       "public_summary": "尚未決定資料邊界、run-specific preregistration、樣本、threshold、fixture、標註者、模型或成本；沒有 evaluator、模型呼叫、訓練或結果。"
+    },
+    {
+      "id": "evidence-protocol-refinement-support",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol-v2"],
+      "artifact_refs": ["artifact-synthetic-protocol-v2"],
+      "public_summary": "修訂把輸出層 H4a 與需要讀者研究的 H4b 分離，並要求 B0／I1 使用共同 response envelope；這支持設計清晰度，不支持模型效果。"
+    },
+    {
+      "id": "evidence-protocol-refinement-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol-v2"],
+      "artifact_refs": ["artifact-synthetic-protocol-v2", "artifact-protocol-refinement-commit"],
+      "public_summary": "12 fixtures、blind labels、reader study、threshold 與 run-specific preregistration 都仍未建立或執行；H4b 明確維持未測。"
     }
   ],
   "events": [
@@ -72,6 +105,43 @@
       },
       "public_summary": "等待擁有者審查資料邊界、可接受的 baseline、標註與失敗判準；沒有治理定案或實作報告。",
       "subject_refs": ["proposal-synthetic-evaluation-protocol"]
+    },
+    {
+      "id": "event-protocol-v2-created",
+      "kind": "subject_created",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T04:31:44Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "根據獨立審查建立較精確的第二版 Proposal；仍未實作或定案。",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol-v2"]
+    },
+    {
+      "id": "event-protocol-v1-superseded",
+      "kind": "superseded",
+      "sequence": 4,
+      "recorded_at": "2026-07-16T04:31:45Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "保留 v0.1 Proposal 的原始範圍，以較精確的 v0.2 Proposal 取代；這是草案修訂，不是治理定案。",
+      "previous_subject_id": "proposal-synthetic-evaluation-protocol",
+      "successor_subject_id": "proposal-synthetic-evaluation-protocol-v2"
+    },
+    {
+      "id": "event-protocol-v2-review",
+      "kind": "review_requested",
+      "sequence": 5,
+      "recorded_at": "2026-07-16T04:31:46Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "請擁有者審查 H4a／H4b 分離、候選 fixture 邊界與失敗判準，尚無治理定案。",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol-v2"]
     }
   ]
 }

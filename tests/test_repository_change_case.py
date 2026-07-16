@@ -13,6 +13,7 @@ RECORDS = ROOT / "records" / "change-case-v0"
 SCHEMA = ROOT / "schemas" / "change-case-v0.schema.json"
 SEQUENCE_PROJECTION_REVISION = "7372348aa6372feda6765a21cec7368377852216"
 PROTOCOL_REVISION = "c9d43c52320c90d598e5ad899c51416c091cb880"
+PROTOCOL_REFINEMENT_REVISION = "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -91,12 +92,19 @@ class RepositoryChangeCaseTests(unittest.TestCase):
 
         self.assertEqual([], validate_change_case(record))
         self.assert_artifacts_are_locatable(record)
-        self.assertTrue(all(artifact["revision"] == PROTOCOL_REVISION for artifact in record["artifacts"]))
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(PROTOCOL_REVISION, artifacts["artifact-synthetic-protocol"]["revision"])
+        self.assertEqual(
+            PROTOCOL_REFINEMENT_REVISION,
+            artifacts["artifact-synthetic-protocol-v2"]["revision"],
+        )
 
-        projection = project_subject(record, "proposal-synthetic-evaluation-protocol")
-        self.assertEqual("under_review", projection.governance)
-        self.assertEqual("no_implementation_report", projection.implementation)
-        self.assertEqual("no_verification_record", projection.verification)
+        original = project_subject(record, "proposal-synthetic-evaluation-protocol")
+        current = project_subject(record, "proposal-synthetic-evaluation-protocol-v2")
+        self.assertEqual("superseded", original.lifecycle)
+        self.assertEqual("under_review", current.governance)
+        self.assertEqual("no_implementation_report", current.implementation)
+        self.assertEqual("no_verification_record", current.verification)
 
 
 if __name__ == "__main__":
