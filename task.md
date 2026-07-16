@@ -142,7 +142,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 - [x] Record `change-case-v0` itself with its Artifact, evidence, authority declaration and limitations.
 - [x] Test that repository records pass both structural and semantic checks.
-- [ ] Record the sequence-ordered report projection revision after it has a stable Artifact revision.
+- [x] Record the sequence-ordered report projection revision after it has a stable Artifact revision.
 **Success criteria**: the public format can account for its own bounded change without silently overwriting history.
 
 ## Phase 3: Evaluation design before model or data work

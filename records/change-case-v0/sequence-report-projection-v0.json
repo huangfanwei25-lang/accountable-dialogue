@@ -1,0 +1,173 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-sequence-report-projection",
+  "public_summary": "回溯記錄：change-case-v0 明確以 canonical sequence，而非 timestamp 或可寫入 status，投影可重複的 implementation 與 verification reports。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-sequence-report-projection",
+      "kind": "proposal",
+      "public_summary": "讓唯讀 projection 回傳 canonical sequence 中最新的 implementation 與 verification report，以及各自的來源 event id。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-projection-source",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/change_case.py",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    },
+    {
+      "id": "artifact-projection-tests",
+      "kind": "test",
+      "locator": "tests/test_change_case.py",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    },
+    {
+      "id": "artifact-repository-record-tests",
+      "kind": "test",
+      "locator": "tests/test_repository_change_case.py",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    },
+    {
+      "id": "artifact-projection-schema",
+      "kind": "schema",
+      "locator": "schemas/change-case-v0.schema.json",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    },
+    {
+      "id": "artifact-projection-design",
+      "kind": "document",
+      "locator": "docs/design/change-case-v0.md",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    },
+    {
+      "id": "artifact-projection-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/7372348aa6372feda6765a21cec7368377852216",
+      "revision": "7372348aa6372feda6765a21cec7368377852216"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-projection-tests",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "artifact_refs": ["artifact-projection-source", "artifact-projection-tests", "artifact-repository-record-tests"],
+      "public_summary": "在 7372348，14 個本機 pytest 案例涵蓋可重複 implementation／verification reports、來源 event id、record Schema 與公開 Artifact locator。"
+    },
+    {
+      "id": "evidence-projection-schema",
+      "kind": "schema_check",
+      "relation": "supports",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "artifact_refs": ["artifact-projection-schema"],
+      "public_summary": "公開 Schema 將 sequence 說明為案件內的 canonical ledger order，且本機 Schema 檢查通過。"
+    },
+    {
+      "id": "evidence-projection-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "artifact_refs": ["artifact-projection-design", "artifact-projection-commit"],
+      "public_summary": "這只界定案件內的讀取順序；它不證明外部事件時間、資料真實性、人身權限、持久化完整性、模型能力或內在狀態。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-projection-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T04:19:23Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯建立 subject，描述已提交 revision 的投影語義修正。",
+      "subject_refs": ["proposal-sequence-report-projection"]
+    },
+    {
+      "id": "event-projection-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T04:19:24Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "請擁有者檢查 sequence 是否應作為唯一投影順序，並檢查公開 claims 是否保持有界。",
+      "subject_refs": ["proposal-sequence-report-projection"]
+    },
+    {
+      "id": "event-projection-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T04:19:25Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "代理依擁有者允許逐步設計與繼續工作的授權，記錄這個低風險公開 projection 修正被接受；這是授權宣告，不是身分、簽章或委派有效性的證明。",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": ["bounded_public_projection_clarification"]
+        },
+        "effective_at": "2026-07-16T04:19:25Z"
+      }
+    },
+    {
+      "id": "event-projection-implemented",
+      "kind": "implementation_reported",
+      "sequence": 4,
+      "recorded_at": "2026-07-16T04:19:26Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯報告 7372348：projection 保留全部 reports，並以 canonical sequence 回傳最新 report 與來源 event id。",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "純本機 validator、唯讀 projection、Schema 說明與 unit tests。",
+        "limitations": [
+          "沒有資料庫、API、時間同步或跨案件排序服務。",
+          "sequence 是案件格式的輸入，不驗證外部世界時間。"
+        ]
+      }
+    },
+    {
+      "id": "event-projection-verified",
+      "kind": "verification_recorded",
+      "sequence": 5,
+      "recorded_at": "2026-07-16T04:19:27Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯記錄 7372348 的本機 tests、lint 與 Schema 檢查；結果只在列出的程式與合成 record 範圍內成立。",
+      "subject_refs": ["proposal-sequence-report-projection"],
+      "evidence_refs": [
+        "evidence-projection-tests",
+        "evidence-projection-schema",
+        "evidence-projection-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "local pytest, ruff, Draft 2020-12 schema check and repository record review",
+        "scope": "7372348 的 source、Schema、文件、synthetic cases 與 repository records。",
+        "limitations": [
+          "不檢查外部 GitHub URL 是否仍可用。",
+          "不驗證部署、使用者效果、事實真值、人格、意識或誠實本質。"
+        ]
+      }
+    }
+  ]
+}

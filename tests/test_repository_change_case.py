@@ -11,6 +11,7 @@ from accountable_dialogue.change_case import project_subject, validate_change_ca
 ROOT = Path(__file__).resolve().parents[1]
 RECORDS = ROOT / "records" / "change-case-v0"
 SCHEMA = ROOT / "schemas" / "change-case-v0.schema.json"
+SEQUENCE_PROJECTION_REVISION = "7372348aa6372feda6765a21cec7368377852216"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -67,6 +68,22 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("under_review", projection.governance)
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("no_verification_record", projection.verification)
+
+    def test_sequence_projection_revision_has_a_bounded_successor_record(self) -> None:
+        record = load_record("sequence-report-projection-v0.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        self.assertTrue(
+            all(artifact["revision"] == SEQUENCE_PROJECTION_REVISION for artifact in record["artifacts"])
+        )
+
+        projection = project_subject(record, "proposal-sequence-report-projection")
+        self.assertEqual("ratified", projection.governance)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("event-projection-implemented", projection.implementation_event_id)
+        self.assertEqual("verified_within_scope", projection.verification)
+        self.assertEqual("event-projection-verified", projection.verification_event_id)
 
 
 if __name__ == "__main__":
