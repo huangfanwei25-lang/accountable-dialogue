@@ -18,7 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from accountable_dialogue.local_pilot import LocalOnlyOllamaClient
+from accountable_dialogue.local_pilot import LocalOnlyOllamaClient, SafeOllamaRequestFailure
 from accountable_dialogue.synthetic_pilot import RESPONSE_FIELDS, canonical_json_digest
 
 CALIBRATION_CASE_FORMAT = "accountable-dialogue/synthetic-judge-calibration-v0"
@@ -132,6 +132,7 @@ class JudgeAssessment:
 
     mechanical_status: str
     label_comparisons: tuple[dict[str, object], ...]
+    transport_observation: dict[str, object] | None = None
 
 
 @dataclass(frozen=True)
@@ -400,9 +401,29 @@ def execute_judge_calibration(
             raw_response = client.generate(target.model, prompt, effective_config)
             assessment = assess_judge_response(case=case, key=key, raw_response=raw_response)
         except TimeoutError:
-            assessment = JudgeAssessment(mechanical_status="timeout", label_comparisons=())
-        except (ConnectionError, ValueError):
-            assessment = JudgeAssessment(mechanical_status="transport_error", label_comparisons=())
+            assessment = JudgeAssessment(
+                mechanical_status="timeout",
+                label_comparisons=(),
+                transport_observation={"kind": "timeout"},
+            )
+        except SafeOllamaRequestFailure as error:
+            assessment = JudgeAssessment(
+                mechanical_status="transport_error",
+                label_comparisons=(),
+                transport_observation=error.public_observation(),
+            )
+        except ConnectionError:
+            assessment = JudgeAssessment(
+                mechanical_status="transport_error",
+                label_comparisons=(),
+                transport_observation={"kind": "network_error"},
+            )
+        except ValueError:
+            assessment = JudgeAssessment(
+                mechanical_status="transport_error",
+                label_comparisons=(),
+                transport_observation={"kind": "provider_contract_error"},
+            )
         latency_ms = round((time.perf_counter() - started) * 1000, 3)
         rows.append(
             {
@@ -413,6 +434,7 @@ def execute_judge_calibration(
                 "timeout_seconds": effective_config.timeout_seconds,
                 "raw_response": raw_response,
                 "label_comparisons": list(assessment.label_comparisons),
+                "transport_observation": assessment.transport_observation,
             }
         )
 
@@ -483,6 +505,7 @@ def _not_executed_wall_rows(targets: Sequence[JudgeCalibrationTarget]) -> list[d
             "timeout_seconds": None,
             "raw_response": None,
             "label_comparisons": [],
+            "transport_observation": None,
         }
         for target in targets
     ]

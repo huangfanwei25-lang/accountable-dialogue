@@ -24,7 +24,7 @@ from accountable_dialogue.judge_calibration import (
     validate_judge_calibration_key,
     validate_judge_verdict,
 )
-from accountable_dialogue.local_pilot import LocalOnlyOllamaClient
+from accountable_dialogue.local_pilot import LocalOnlyOllamaClient, SafeOllamaRequestFailure
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE_ROOT = ROOT / "fixtures" / "synthetic-judge-calibration-v0"
@@ -36,8 +36,13 @@ VERDICT_SCHEMA_PATH = ROOT / "schemas" / "judge-verdict-v0.schema.json"
 
 
 class FakeOllamaTransport:
-    def __init__(self, responses: list[dict[str, object]] | None = None) -> None:
+    def __init__(
+        self,
+        responses: list[dict[str, object]] | None = None,
+        failures: list[BaseException] | None = None,
+    ) -> None:
         self.responses = list(responses or [])
+        self.failures = list(failures or [])
         self.requests: list[tuple[str, str, dict[str, object] | None, float]] = []
 
     def request(
@@ -56,6 +61,8 @@ class FakeOllamaTransport:
                 ]
             }
         if url.endswith("/api/generate"):
+            if self.failures:
+                raise self.failures.pop(0)
             if self.responses:
                 return self.responses.pop(0)
             raise AssertionError("fake transport received an unexpected generation request")
@@ -266,6 +273,49 @@ class JudgeCalibrationTests(unittest.TestCase):
 
         self.assertEqual(0, completed.returncode, completed.stderr)
         self.assertIn("--output-dir", completed.stdout)
+
+    def test_runner_keeps_only_a_safe_transport_observation(self) -> None:
+        failure = SafeOllamaRequestFailure("http_5xx", http_status=500)
+        failure.__cause__ = RuntimeError(r"server body C:\private\secret.txt")
+        transport = FakeOllamaTransport(failures=[failure])
+        client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=transport)
+        target = JudgeCalibrationTarget(case_id="j0-incomplete-withhold", model="tiny-a:latest")
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            result = execute_judge_calibration(
+                cases=(self.case,),
+                targets=(target,),
+                client=client,
+                config=JudgeCalibrationConfig(timeout_seconds=3, max_tokens=80, wall_time_seconds=10),
+                output_dir=Path(temporary_directory) / "judge-output",
+                repository_root=ROOT,
+            )
+
+        row = result.rows[0]
+        self.assertEqual("transport_error", row["mechanical_status"])
+        self.assertEqual({"kind": "http_5xx", "http_status": 500}, row["transport_observation"])
+        self.assertNotIn("private", json.dumps(row, ensure_ascii=False))
+
+        timeout_transport = FakeOllamaTransport(failures=[TimeoutError(r"C:\private\timeout")])
+        timeout_client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=timeout_transport)
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            timeout_result = execute_judge_calibration(
+                cases=(self.case,),
+                targets=(target,),
+                client=timeout_client,
+                config=JudgeCalibrationConfig(timeout_seconds=3, max_tokens=80, wall_time_seconds=10),
+                output_dir=Path(temporary_directory) / "judge-timeout-output",
+                repository_root=ROOT,
+            )
+        self.assertEqual("timeout", timeout_result.rows[0]["mechanical_status"])
+        self.assertEqual({"kind": "timeout"}, timeout_result.rows[0]["transport_observation"])
+
+        malformed_transport = FakeOllamaTransport(responses=[{"not_response": "C:\\private\\body"}])
+        malformed_client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=malformed_transport)
+        with self.assertRaises(SafeOllamaRequestFailure) as raised:
+            malformed_client.generate("tiny-a:latest", "synthetic", JudgeCalibrationConfig(max_tokens=80))
+        self.assertEqual("provider_contract_error", raised.exception.kind)
+        self.assertNotIn("private", str(raised.exception))
 
 
 if __name__ == "__main__":

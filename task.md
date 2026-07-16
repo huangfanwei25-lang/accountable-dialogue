@@ -330,3 +330,23 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [ ] Owner chooses a supported host upgrade, a separate supported host, or to stop local model-judge exploration.
 - [ ] Only after that decision, create a new synthetic-only successor plan; never retry the original three calls.
 **Success criteria**: a repository automation does not alter the user's OS, restart services or download models to bypass an unsupported host boundary.
+
+---
+
+## Active Short Board: J0 Transport Observability Successor v0 (2026-07-16)
+
+> The initial J0 result is preserved. This successor improves only the safe failure vocabulary for a future,
+> separately authorized compatibility probe; it does not send a new generation on the current unsupported host.
+
+## Phase 1: Fix the diagnostic boundary with mocks only
+
+- [x] Preserve finite transport categories and optional HTTP status without serializing error text, bodies, headers, URLs or local paths.
+- [x] Test HTTP 4xx/5xx, network failure, timeout and provider-contract failure with deliberately sensitive-looking fake details.
+- [x] Keep a valid judge verdict separate from a provider contract failure and preserve the existing `mechanical_status` vocabulary.
+**Success criteria**: future external output can explain a transport stop without becoming a private server log.
+
+## Phase 2: Remain inactive until the host decision
+
+- [ ] Do not execute this successor on the current Windows 1903 host.
+- [ ] If the owner supplies a supported host decision, create a one-packet synthetic-only plan and record it before any generation.
+**Success criteria**: better error accounting never becomes a disguised retry of the original probe.

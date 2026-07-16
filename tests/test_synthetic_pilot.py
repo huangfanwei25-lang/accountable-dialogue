@@ -1,16 +1,21 @@
 from __future__ import annotations
 
 import copy
+import io
 import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from urllib.error import HTTPError, URLError
 
 from jsonschema import Draft202012Validator
 
 from accountable_dialogue.local_pilot import (
     LocalOnlyOllamaClient,
     PilotExecutionConfig,
+    SafeOllamaRequestFailure,
+    UrllibOllamaTransport,
     condition_mapping_commitment,
     execute_pilot,
     validate_loopback_base_url,
@@ -70,6 +75,43 @@ class FakeOllamaTransport:
 
 
 class SyntheticPilotTests(unittest.TestCase):
+    def test_urllib_transport_never_exports_http_or_network_error_text(self) -> None:
+        transport = UrllibOllamaTransport()
+        http_error = HTTPError(
+            "http://127.0.0.1:11434/api/generate",
+            500,
+            "server error",
+            hdrs=None,
+            fp=io.BytesIO(b'{"error":"C:\\\\private\\\\secret.txt"}'),
+        )
+        with patch("accountable_dialogue.local_pilot.urlopen", side_effect=http_error):
+            with self.assertRaises(SafeOllamaRequestFailure) as raised:
+                transport.request("POST", "http://127.0.0.1:11434/api/generate", {}, 1)
+        self.assertEqual("http_5xx", raised.exception.kind)
+        self.assertEqual(500, raised.exception.http_status)
+        self.assertNotIn("private", str(raised.exception))
+
+        http_400 = HTTPError(
+            "http://127.0.0.1:11434/api/generate",
+            400,
+            "client error",
+            hdrs=None,
+            fp=io.BytesIO(b'{"error":"C:\\\\private\\\\bad-request.txt"}'),
+        )
+        with patch("accountable_dialogue.local_pilot.urlopen", side_effect=http_400):
+            with self.assertRaises(SafeOllamaRequestFailure) as raised:
+                transport.request("POST", "http://127.0.0.1:11434/api/generate", {}, 1)
+        self.assertEqual("http_4xx", raised.exception.kind)
+        self.assertEqual(400, raised.exception.http_status)
+        self.assertNotIn("private", str(raised.exception))
+
+        with patch("accountable_dialogue.local_pilot.urlopen", side_effect=URLError(r"C:\private\network")):
+            with self.assertRaises(SafeOllamaRequestFailure) as raised:
+                transport.request("GET", "http://127.0.0.1:11434/api/tags", None, 1)
+        self.assertEqual("network_error", raised.exception.kind)
+        self.assertIsNone(raised.exception.http_status)
+        self.assertNotIn("private", str(raised.exception))
+
     def test_case_loader_can_preselect_a_narrow_smoke_scope(self) -> None:
         selected = load_cases(("h1-incomplete-library-hours",))
 

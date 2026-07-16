@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
@@ -54,6 +54,34 @@ class LocalGenerationConfig(Protocol):
     timeout_seconds: float
 
 
+class SafeOllamaRequestFailure(ConnectionError):
+    """A bounded provider failure that deliberately excludes server error text."""
+
+    _ALLOWED_KINDS = frozenset(
+        {"http_4xx", "http_5xx", "http_other", "network_error", "provider_contract_error"}
+    )
+
+    def __init__(self, kind: str, *, http_status: int | None = None) -> None:
+        if kind not in self._ALLOWED_KINDS:
+            raise ValueError("safe Ollama failure kind is not allowed")
+        if kind.startswith("http_"):
+            if not isinstance(http_status, int) or not 100 <= http_status <= 599:
+                raise ValueError("HTTP failure needs a valid status code")
+        elif http_status is not None:
+            raise ValueError("only HTTP failures may include a status code")
+        self.kind = kind
+        self.http_status = http_status
+        super().__init__(f"local Ollama request failed ({kind})")
+
+    def public_observation(self) -> dict[str, object]:
+        """Return only the finite category and optional HTTP status for external output."""
+
+        observation: dict[str, object] = {"kind": self.kind}
+        if self.http_status is not None:
+            observation["http_status"] = self.http_status
+        return observation
+
+
 class UrllibOllamaTransport:
     """A standard-library JSON client with no credentials or remote fallback."""
 
@@ -73,15 +101,24 @@ class UrllibOllamaTransport:
         )
         try:
             with urlopen(request, timeout=timeout_seconds) as response:
-                decoded = response.read().decode("utf-8")
-        except URLError as error:
-            raise ConnectionError("local Ollama request failed") from error
+                response_bytes = response.read()
+        except HTTPError as error:
+            status = error.code
+            error.close()
+            raise SafeOllamaRequestFailure(_http_failure_kind(status), http_status=status) from None
+        except TimeoutError:
+            raise TimeoutError("local Ollama request timed out") from None
+        except URLError:
+            raise SafeOllamaRequestFailure("network_error") from None
+        except OSError:
+            raise SafeOllamaRequestFailure("network_error") from None
         try:
+            decoded = response_bytes.decode("utf-8")
             value = json.loads(decoded)
-        except json.JSONDecodeError as error:
-            raise ValueError("local Ollama response was not JSON") from error
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            raise SafeOllamaRequestFailure("provider_contract_error") from None
         if not isinstance(value, dict):
-            raise ValueError("local Ollama response must be an object")
+            raise SafeOllamaRequestFailure("provider_contract_error")
         return value
 
 
@@ -159,14 +196,14 @@ class LocalOnlyOllamaClient:
         )
         output = response.get("response")
         if not isinstance(output, str):
-            raise ValueError("local Ollama generation did not include a string response")
+            raise SafeOllamaRequestFailure("provider_contract_error")
         return output
 
     def _model_catalog(self) -> dict[str, str]:
         response = self.transport.request("GET", f"{self.base_url}/api/tags", None, 10.0)
         values = response.get("models")
         if not isinstance(values, list):
-            raise ValueError("local Ollama model listing is invalid")
+            raise SafeOllamaRequestFailure("provider_contract_error")
         catalog: dict[str, str] = {}
         for item in values:
             if not isinstance(item, Mapping):
@@ -177,6 +214,14 @@ class LocalOnlyOllamaClient:
             digest = item.get("digest")
             catalog[name] = digest if isinstance(digest, str) and digest else "unknown"
         return dict(sorted(catalog.items()))
+
+
+def _http_failure_kind(status: int) -> str:
+    if 400 <= status <= 499:
+        return "http_4xx"
+    if 500 <= status <= 599:
+        return "http_5xx"
+    return "http_other"
 
 
 def validate_loopback_base_url(value: str) -> str:
