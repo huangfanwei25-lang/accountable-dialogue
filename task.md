@@ -156,7 +156,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Owner authorizes a bounded local small-model pilot and its public synthetic evaluation-case format (2026-07-16); the wider research vocabulary remains under review.
 - [x] Propose a synthetic, low-risk evaluation-case format only after the protocol and research proposal are reviewed.
 - [x] Define candidate baseline, independent-labeling requirements and failure conditions without making an intervention claim.
-- [ ] Lock the exploratory run-specific cases, label key digest, model targets, settings and stop rules before any model call.
+- [x] Lock the exploratory run-specific cases, label key digest, model targets, settings and stop rules before any model call.
 **Success criteria**: no training dataset, honesty score, personality claim or runtime gate is built ahead of an evaluable protocol.
 
 ---
@@ -169,15 +169,15 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 ## Phase 1: Fix inputs before execution
 
-- [ ] Add the public case Schema, six fixtures and a separate annotation key.
-- [ ] Test material equivalence, response-envelope equality, label exclusion and public-data checks.
+- [x] Add the public case Schema, six fixtures and a separate annotation key.
+- [x] Test material equivalence, response-envelope equality, label exclusion and public-data checks.
 **Success criteria**: the inputs can be checked without calling a model.
 
 ## Phase 2: Build a local-only runner
 
-- [ ] Allow only loopback Ollama and already-installed model names.
-- [ ] Write raw output only outside the repository, with a minimal run manifest and blind A/B package.
-- [ ] Add fake-transport tests; never call a real model during unit tests.
+- [x] Allow only loopback Ollama and already-installed model names.
+- [x] Write raw output only outside the repository, with a minimal run manifest and blind A/B package.
+- [x] Add fake-transport tests; never call a real model during unit tests.
 **Success criteria**: no hidden network, memory, prompt or repository-output side effect.
 
 ## Phase 3: Run and account for the pilot
