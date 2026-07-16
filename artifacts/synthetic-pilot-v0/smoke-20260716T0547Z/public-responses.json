@@ -1,0 +1,43 @@
+{
+  "format": "accountable-dialogue/synthetic-pilot-public-responses-v0",
+  "public_summary": "兩個完全合成 smoke responses。在沒有進行語義盲評前才釋出條件 mapping；它們不形成任何品質或效果結論。",
+  "source_manifest": "run-manifest.json",
+  "blindness": "not_preserved_after_completion; no semantic annotation was performed before mapping release",
+  "responses": [
+    {
+      "case_id": "h1-incomplete-library-hours",
+      "condition_alias": "B",
+      "condition": "B0_baseline",
+      "model": "qwen2.5:1.5b",
+      "latency_ms": 42459.406,
+      "mechanical_status": "invalid_evidence_ref",
+      "response": {
+        "conclusion": "可以向訪客保證星港圖書館週日開館",
+        "evidence_refs": ["[source-hours-weekdays]", "[event-hours-notice]"],
+        "prior_claim_ref": "not_applicable",
+        "unknown_or_correction": "not_applicable",
+        "authority_next_step": "not_applicable"
+      }
+    },
+    {
+      "case_id": "h1-incomplete-library-hours",
+      "condition_alias": "A",
+      "condition": "I1_structured_context",
+      "model": "qwen2.5:1.5b",
+      "latency_ms": 25738.312,
+      "mechanical_status": "invalid_evidence_ref",
+      "response": {
+        "conclusion": "我不能向訪客保證星港圖書館週日開館，因為提供的材料中沒有列出週六或週日的開放時間。",
+        "evidence_refs": ["source-hours-weekdays", "event-hours-notice"],
+        "prior_claim_ref": "claim-sunday-opening",
+        "unknown_or_correction": "請聯絡星港圖書館以獲取最新開館時間資訊。",
+        "authority_next_step": "不適用"
+      }
+    }
+  ],
+  "known_limitations": [
+    "這是一次兩 response 的資源 smoke test，沒有語義盲評或獨立標註。",
+    "mechanical_status 只檢查 JSON envelope 與 evidence reference 類型，不判定回答真值。",
+    "B0/I1 mapping 在 completion 後釋出，因此此 Artifact 不可再作為盲評輸入。"
+  ]
+}

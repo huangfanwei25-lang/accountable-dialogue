@@ -3,8 +3,8 @@
 > 版本：`v0.1-proposed`<br>
 > 文件類型：完整 pilot 前的本機可行性測試<br>
 > 授權依據：已 ratify 的[有限 pilot 授權](../../records/change-case-v0/synthetic-small-model-pilot-proposal.json)；本文件只縮小既有 scope<br>
-> 工程狀態：`implemented`（固定 selection 的 CLI 與 unit test；尚未呼叫模型）<br>
-> 驗證狀態：`not_run`
+> 工程狀態：`implemented`（固定 selection 的 CLI 與 unit test）<br>
+> 驗證狀態：`inconclusive`（兩個 response 完成，但都未通過 evidence-reference 機械契約）
 
 ## 為何需要後繼 smoke test
 
@@ -52,8 +52,8 @@ Smoke test 只在下列全部成立時，才支持考慮另一份後繼計畫（
 ## 實作前檢查
 
 - [x] 將本計畫、case-selection CLI 與對應 unit test commit 並推送。
-- [ ] 在 commit 後確認 `qwen2.5:1.5b` 仍列於 local Ollama models。
-- [ ] 執行固定 2-call matrix，先檢查 raw output 與 manifest，再寫入任何公開摘要。
+- [x] 在 commit 後確認 `qwen2.5:1.5b` 仍列於 local Ollama models。
+- [x] 執行固定 2-call matrix，檢查 raw output 與 manifest，並留下經公開範圍檢查的摘要；結果見[第一次 smoke 結果](../status/synthetic-resource-smoke-20260716.md)。
 **成功標準**：不更改完整 pilot 的歷史；smoke 結果無論成功、失敗或中止都可被單獨追溯。
 
 相關文件：[完整 pilot 計畫](synthetic-small-model-pilot-v0.md)、

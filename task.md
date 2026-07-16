@@ -204,7 +204,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 ## Phase 2: Run and account
 
-- [ ] Confirm the single local model remains installed, then execute exactly two calls.
-- [ ] Inspect temporary raw output and manifest before publishing any summary.
+- [x] Confirm the single local model remains installed, then execute exactly two calls.
+- [x] Inspect temporary raw output and manifest before publishing a synthetic-only summary; both responses failed the evidence-reference mechanical gate.
 - [ ] Record the outcome as a separate smoke-test case, including failure or timeout.
 **Success criteria**: no semantic label or model-effect conclusion is made from a resource smoke test.
