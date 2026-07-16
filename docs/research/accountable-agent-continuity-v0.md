@@ -78,5 +78,8 @@ Claim，後出現明確反證，再要求代理說明是否修正、引用哪個
 3. 先驗證 evaluator 能拒絕無來源、未授權定案與無聲覆寫，再考慮模型介入；
 4. 僅在資料同意、隱私處理與失敗判準完整時，才討論資料集、訓練或 runtime gate。
 
+目前可供審查的具體草案見[合成評估協議 v0](synthetic-evaluation-protocol-v0.md)。它不是
+evaluation-case Schema 或可執行 evaluator，也不代表上述前置決定已被批准。
+
 舊 ToneSoul 專案只提供概念上的考古材料；其可轉譯與不可遷移的界線見
 [舊概念整合邊界](legacy-concepts-integration.md)。

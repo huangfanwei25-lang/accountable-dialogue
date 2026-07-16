@@ -148,6 +148,8 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 ## Phase 3: Evaluation design before model or data work
 
 - [ ] Owner ratifies, narrows or rejects the research vocabulary and any future data boundary.
-- [ ] Propose a synthetic, low-risk evaluation-case format only after this research proposal is reviewed.
-- [ ] Define a baseline, independent outcome labels and failure criteria before making any intervention claim.
+- [x] Draft a reviewable synthetic evaluation protocol without creating an evaluation-case format or evaluator.
+- [ ] Propose a synthetic, low-risk evaluation-case format only after the protocol and research proposal are reviewed.
+- [x] Define candidate baseline, independent-labeling requirements and failure conditions without making an intervention claim.
+- [ ] Pre-register run-specific sample, labels, thresholds and model settings before any actual intervention claim.
 **Success criteria**: no training dataset, honesty score, personality claim or runtime gate is built ahead of an evaluable protocol.

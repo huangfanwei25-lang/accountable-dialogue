@@ -32,6 +32,7 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 - [公開邊界](PUBLIC_BOUNDARY.md)：什麼可以進公開倉庫，什麼必須留在受限環境。
 - [研究邊界：可問責的認識論行為](docs/research/behavioral-honesty-research-boundary.md)：若要研究「誠實相關行為」，什麼才是可測的問題。
 - [可問責的代理連續性 v0](docs/research/accountable-agent-continuity-v0.md)：將誠實、記憶、人格與治理拆成可反駁的研究問題，而非一個靈魂或誠實分數。
+- [合成評估協議 v0](docs/research/synthetic-evaluation-protocol-v0.md)：在不收集私人對話、不訓練模型的前提下，定義未來如何測試候選行為；仍待審查。
 - [舊概念整合邊界](docs/research/legacy-concepts-integration.md)：只重寫可公開的設計教訓，不搬入舊記憶、日誌或 runtime。
 - [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
 - [變更案件模型 v0](docs/design/change-case-v0.md)：第一個公開原型如何區分事項、依據、事件與唯讀投影。
