@@ -274,7 +274,37 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 ## Phase 2: Await procedural authority
 
-- [ ] Owner chooses whether two independent annotators can be used and what they may see or retain.
+- [x] Owner chooses two external independent human annotators as the intended formal H1 review lane; assistant and models remain non-independent advisory lanes.
+- [ ] Owner appoints the two people and fixes what they may see or retain, including a no-mapping/no-other-verdict attestation.
 - [ ] Owner chooses whether to authorize a fresh H1 four-response run under the frozen protocol.
 - [ ] Only then create a run-specific change case, packetize outputs, collect independent verdicts and reveal the mapping.
 **Success criteria**: no semantic comparison happens without an independently reviewable process and an explicit human decision.
+
+---
+
+## Active Short Board: J0 Small-Model Judge Feasibility v0 (2026-07-16)
+
+> Owner asked whether the installed small local models can serve as judges. This is a separate, fully
+> synthetic calibration of an auxiliary tool. It cannot replace the two external human H1 raters,
+> recreate the owner's full context, or establish an honesty, personality, consciousness or self-model claim.
+
+## Phase 1: Fix the calibration before a model call
+
+- [x] Add a closed calibration fixture/key, renderer, parser and comparison model that keeps expected verdicts out of prompts.
+- [x] Include clear pass/fail cases plus a candidate-response instruction-data control.
+- [x] Test loopback-only execution, output isolation, closed judge JSON, reference checks and no silent correction.
+**Success criteria**: model output can be mechanically compared with a precommitted synthetic oracle without leaking it to the model.
+
+## Phase 2: Resource-gated local probe
+
+- [ ] Commit and push the J0 harness and plan before a live call.
+- [ ] Run only the fixed two-packet Qwen probe and one-packet Llama resource probe, with no retry and a 300-second wall-time gate.
+- [ ] Record a bounded result or inconclusive stop without reporting an aggregate judge score.
+**Success criteria**: the repository can distinguish a usable calibration candidate from a format/resource failure without treating either as human judgment.
+
+## Phase 3: Decide whether any extra model is warranted
+
+- [ ] Do not download before the initial probe.
+- [ ] If needed, consider only the fixed official Ollama Qwen3 tag after source, digest, local-only and scan checks.
+- [ ] Keep any extra model on a one-packet synthetic probe until its own result is separately accounted for.
+**Success criteria**: convenience never expands the trust or supply-chain boundary silently.

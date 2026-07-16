@@ -44,6 +44,16 @@ class OllamaTransport(Protocol):
     ) -> dict[str, object]: ...
 
 
+class LocalGenerationConfig(Protocol):
+    """The fixed local generation options shared by bounded callers."""
+
+    seed: int
+    temperature: int
+    context_tokens: int
+    max_tokens: int
+    timeout_seconds: float
+
+
 class UrllibOllamaTransport:
     """A standard-library JSON client with no credentials or remote fallback."""
 
@@ -128,7 +138,7 @@ class LocalOnlyOllamaClient:
             raise ValueError(f"requested model is not installed locally: {rendered}")
         return {model: catalog[model] for model in models}
 
-    def generate(self, model: str, prompt: str, config: PilotExecutionConfig) -> str:
+    def generate(self, model: str, prompt: str, config: LocalGenerationConfig) -> str:
         self.require_models((model,))
         response = self.transport.request(
             "POST",

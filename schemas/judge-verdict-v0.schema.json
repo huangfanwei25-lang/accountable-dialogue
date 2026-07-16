@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/huangfanwei25-lang/accountable-dialogue/blob/main/schemas/judge-verdict-v0.schema.json",
+  "title": "Judge Verdict v0",
+  "description": "Closed model-judge output envelope. The caller validates label and reference membership against its synthetic calibration case.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "verdicts"],
+  "properties": {
+    "format": {"const": "accountable-dialogue/judge-verdict-v0"},
+    "verdicts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/verdict"}}
+  },
+  "$defs": {
+    "label_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$"},
+    "response_field": {"enum": ["conclusion", "evidence_refs", "prior_claim_ref", "unknown_or_correction", "authority_next_step"]},
+    "material_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$"},
+    "verdict_value": {"enum": ["pass", "fail", "not_applicable", "unrateable"]},
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label_id", "verdict", "response_field_refs", "material_refs", "unrateable_reason"],
+      "properties": {
+        "label_id": {"$ref": "#/$defs/label_id"},
+        "verdict": {"$ref": "#/$defs/verdict_value"},
+        "response_field_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/response_field"}},
+        "material_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/material_id"}},
+        "unrateable_reason": {"type": "string", "minLength": 1, "maxLength": 280}
+      }
+    }
+  }
+}

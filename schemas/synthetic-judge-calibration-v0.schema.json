@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/huangfanwei25-lang/accountable-dialogue/blob/main/schemas/synthetic-judge-calibration-v0.schema.json",
+  "title": "Synthetic Judge Calibration Case v0",
+  "description": "A fully synthetic candidate response and rubric for bounded model-judge calibration. Expected verdicts live in a separate key and must never be rendered into a judge prompt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "case_id", "public_summary", "risk", "task", "materials", "candidate_response", "rubric", "calibration_key", "known_limitations"],
+  "properties": {
+    "format": {"const": "accountable-dialogue/synthetic-judge-calibration-v0"},
+    "case_id": {"$ref": "#/$defs/id"},
+    "public_summary": {"$ref": "#/$defs/text"},
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["class", "reversible"],
+      "properties": {"class": {"const": "low"}, "reversible": {"const": true}}
+    },
+    "task": {"$ref": "#/$defs/text"},
+    "materials": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/material"}},
+    "candidate_response": {"$ref": "#/$defs/response"},
+    "rubric": {"$ref": "#/$defs/rubric"},
+    "calibration_key": {"$ref": "#/$defs/key_ref"},
+    "known_limitations": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$"},
+    "label_id": {"type": "string", "pattern": "^[a-z][a-z0-9_]{2,63}$"},
+    "text": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "verdict": {"enum": ["pass", "fail", "not_applicable", "unrateable"]},
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "text"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "kind": {"enum": ["source_excerpt", "claim", "event", "authority_constraint"]},
+        "text": {"$ref": "#/$defs/text"}
+      }
+    },
+    "response": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conclusion", "evidence_refs", "prior_claim_ref", "unknown_or_correction", "authority_next_step"],
+      "properties": {
+        "conclusion": {"$ref": "#/$defs/text"},
+        "evidence_refs": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/text"}},
+        "prior_claim_ref": {"$ref": "#/$defs/text"},
+        "unknown_or_correction": {"$ref": "#/$defs/text"},
+        "authority_next_step": {"$ref": "#/$defs/text"}
+      }
+    },
+    "rubric_label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "pass_when", "fail_when"],
+      "properties": {
+        "id": {"$ref": "#/$defs/label_id"},
+        "pass_when": {"$ref": "#/$defs/text"},
+        "fail_when": {"$ref": "#/$defs/text"}
+      }
+    },
+    "rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["labels", "allowed_verdicts"],
+      "properties": {
+        "labels": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/rubric_label"}},
+        "allowed_verdicts": {"type": "array", "minItems": 4, "uniqueItems": true, "items": {"$ref": "#/$defs/verdict"}}
+      }
+    },
+    "key_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "locator", "sha256"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "locator": {"type": "string", "pattern": "^(?!.*(?:^|[\\/])\\.\\.(?:[\\/]|$))(?![A-Za-z]:)(?![\\/]).+"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    }
+  }
+}
