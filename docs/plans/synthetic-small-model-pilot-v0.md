@@ -111,6 +111,7 @@ python -m scripts.run_synthetic_pilot
 ## Phase 3: 執行與如實記錄
 
 - [ ] 先確認兩個模型都已本機可用，再執行 24 次固定設定呼叫。
+- [x] 啟動完整 matrix 的第一次嘗試；因 CPU 路徑數分鐘未回傳完成 response 而停止，詳見[第一次執行嘗試](../status/synthetic-pilot-attempt-20260716.md)。
 - [ ] 檢查輸出與 metadata，再決定是否留下經最小化處理的公開 Artifact。
 - [ ] 將 run 或無法執行的原因以 change-case 記錄，保留限制與失敗。
 **成功標準**：結果有可重算輸入、設定、限制與失敗紀錄；沒有超出本 pilot 的能力宣稱。

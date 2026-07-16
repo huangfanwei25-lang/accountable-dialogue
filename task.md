@@ -183,6 +183,7 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 ## Phase 3: Run and account for the pilot
 
 - [ ] Verify both local model targets are available and execute the fixed 24-call matrix.
+- [x] Start the fixed matrix once; stop it before any completed response when CPU execution made the fixed budget disproportionate, and preserve an inconclusive attempt record.
 - [ ] Inspect output safety and mechanical integrity before selecting any public Artifact.
 - [ ] Record results, non-results or blocked execution with limits in a new change case.
 **Success criteria**: any conclusion is bounded to the run, inputs and models actually observed.
