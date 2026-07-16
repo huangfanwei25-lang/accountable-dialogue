@@ -34,6 +34,7 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 - [可問責的代理連續性 v0](docs/research/accountable-agent-continuity-v0.md)：將誠實、記憶、人格與治理拆成可反駁的研究問題，而非一個靈魂或誠實分數。
 - [合成評估協議 v0](docs/research/synthetic-evaluation-protocol-v0.md)：在不收集私人對話、不訓練模型的前提下，定義未來如何測試候選行為；仍待審查。
 - [合成評估案件候選格式 v0](docs/design/synthetic-evaluation-case-v0.md)：先把虛構案例、labels 與 run 結果分開；它不是 Schema、資料集或 evaluator。
+- [合成小模型 Pilot v0](docs/plans/synthetic-small-model-pilot-v0.md)：獲授權的 6-case、兩條件、兩個本機小模型探索；結果尚未產生。
 - [舊概念整合邊界](docs/research/legacy-concepts-integration.md)：只重寫可公開的設計教訓，不搬入舊記憶、日誌或 runtime。
 - [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
 - [變更案件模型 v0](docs/design/change-case-v0.md)：第一個公開原型如何區分事項、依據、事件與唯讀投影。

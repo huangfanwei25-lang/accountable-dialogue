@@ -153,7 +153,36 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Separate output-level H4a from untested reader-attribution H4b, and add control fixtures and falsification gates.
 - [x] Preserve the initial protocol proposal and record its v0.2 refinement as a successor rather than overwriting it.
 - [x] Draft the candidate evaluation-case data boundary without creating a Schema, fixture, runner, model call, or result claim.
-- [ ] Propose a synthetic, low-risk evaluation-case format only after the protocol and research proposal are reviewed.
+- [x] Owner authorizes a bounded local small-model pilot and its public synthetic evaluation-case format (2026-07-16); the wider research vocabulary remains under review.
+- [x] Propose a synthetic, low-risk evaluation-case format only after the protocol and research proposal are reviewed.
 - [x] Define candidate baseline, independent-labeling requirements and failure conditions without making an intervention claim.
-- [ ] Pre-register run-specific sample, labels, thresholds and model settings before any actual intervention claim.
+- [ ] Lock the exploratory run-specific cases, label key digest, model targets, settings and stop rules before any model call.
 **Success criteria**: no training dataset, honesty score, personality claim or runtime gate is built ahead of an evaluable protocol.
+
+---
+
+## Active Short Board: Synthetic Small-Model Pilot v0 (2026-07-16)
+
+> Owner authorized an exploratory local pilot only: six fully fictional, low-risk, reversible cases;
+> B0/I1 comparison; and two small local models. This does not authorize private inputs, training,
+> H4b reader research, public release of unreviewed raw outputs, or any claim about inner honesty.
+
+## Phase 1: Fix inputs before execution
+
+- [ ] Add the public case Schema, six fixtures and a separate annotation key.
+- [ ] Test material equivalence, response-envelope equality, label exclusion and public-data checks.
+**Success criteria**: the inputs can be checked without calling a model.
+
+## Phase 2: Build a local-only runner
+
+- [ ] Allow only loopback Ollama and already-installed model names.
+- [ ] Write raw output only outside the repository, with a minimal run manifest and blind A/B package.
+- [ ] Add fake-transport tests; never call a real model during unit tests.
+**Success criteria**: no hidden network, memory, prompt or repository-output side effect.
+
+## Phase 3: Run and account for the pilot
+
+- [ ] Verify both local model targets are available and execute the fixed 24-call matrix.
+- [ ] Inspect output safety and mechanical integrity before selecting any public Artifact.
+- [ ] Record results, non-results or blocked execution with limits in a new change case.
+**Success criteria**: any conclusion is bounded to the run, inputs and models actually observed.
