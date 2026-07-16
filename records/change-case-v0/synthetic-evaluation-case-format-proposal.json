@@ -1,0 +1,77 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-synthetic-evaluation-case-format",
+  "public_summary": "記錄合成評估案件候選資料邊界：它把虛構測試材料、labels 與未來 run 結果分開，但尚未建立 Schema、fixture、runner 或模型評估。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-synthetic-evaluation-case-format",
+      "kind": "proposal",
+      "public_summary": "為完全虛構、低風險、可逆的 B0／I1 比較提出資料邊界，避免把模型輸出、gold labels、私人脈絡與效果結論混入 fixture。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-evaluation-case-design",
+      "kind": "document",
+      "locator": "docs/design/synthetic-evaluation-case-v0.md",
+      "revision": "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
+    },
+    {
+      "id": "artifact-evaluation-protocol-v2",
+      "kind": "document",
+      "locator": "docs/research/synthetic-evaluation-protocol-v0.md",
+      "revision": "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
+    },
+    {
+      "id": "artifact-evaluation-case-design-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845",
+      "revision": "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-evaluation-case-boundary-support",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-synthetic-evaluation-case-format"],
+      "artifact_refs": ["artifact-evaluation-case-design", "artifact-evaluation-protocol-v2"],
+      "public_summary": "候選設計保留 B0／I1 同材料與共同 response envelope 的要求，並將 fixture、label pack 與 future run record 分開；這支持資料邊界清晰度，不支持模型效果。"
+    },
+    {
+      "id": "evidence-evaluation-case-boundary-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-synthetic-evaluation-case-format"],
+      "artifact_refs": ["artifact-evaluation-case-design", "artifact-evaluation-case-design-commit"],
+      "public_summary": "沒有 JSON Schema、validator、fixture、label pack、runner、模型輸出、獨立標註、run-specific preregistration 或結果；digest 承諾也不證明標籤正確或介入有效。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-evaluation-case-format-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T04:40:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立候選資料格式 Proposal，沒有建立可執行的評估材料或治理規則。",
+      "subject_refs": ["proposal-synthetic-evaluation-case-format"]
+    },
+    {
+      "id": "event-evaluation-case-format-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T04:40:01Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "請擁有者審查資料公開邊界、盲評隔離、run metadata 與 H4b 獨立門檻；尚無治理定案、實作或驗證紀錄。",
+      "subject_refs": ["proposal-synthetic-evaluation-case-format"]
+    }
+  ]
+}
