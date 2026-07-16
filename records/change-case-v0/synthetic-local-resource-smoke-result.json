@@ -1,0 +1,125 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-local-resource-smoke-20260716",
+  "public_summary": "記錄 Qwen 單 case B0／I1 資源 smoke：兩個合成 response 在 240 秒時間門檻內完成，但 evidence-reference 機械契約都未通過；不形成語義或效果結論。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "observation-smoke-evidence-contract-gap",
+      "kind": "observation",
+      "public_summary": "本機 Qwen 的兩個完成 response 都把 event 或非精確 id 放入 evidence_refs；連同固定的 renderer、validator 與 fixture，構成需檢查 response instruction 與 evidence-only mechanical contract 是否對齊的可追溯反例。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-smoke-status",
+      "kind": "document",
+      "locator": "docs/status/synthetic-resource-smoke-20260716.md",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-manifest",
+      "kind": "source_file",
+      "locator": "artifacts/synthetic-pilot-v0/smoke-20260716T0547Z/run-manifest.json",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-responses",
+      "kind": "source_file",
+      "locator": "artifacts/synthetic-pilot-v0/smoke-20260716T0547Z/public-responses.json",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-plan",
+      "kind": "document",
+      "locator": "docs/plans/synthetic-local-resource-smoke-v0.md",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-fixture",
+      "kind": "source_file",
+      "locator": "fixtures/synthetic-pilot-v0/cases/h1-incomplete-library-hours.json",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-prompt-renderer",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/synthetic_pilot.py",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-response-validator",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    },
+    {
+      "id": "artifact-smoke-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/2dca34ae9073dd29a7e9913e48644257b2c70ca7",
+      "revision": "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-smoke-completion-with-contract-failure",
+      "kind": "runtime_observation",
+      "relation": "supports",
+      "subject_refs": ["observation-smoke-evidence-contract-gap"],
+      "artifact_refs": ["artifact-smoke-manifest", "artifact-smoke-responses", "artifact-smoke-status"],
+      "public_summary": "兩個 response 在約 69 秒的兩呼叫 smoke 中完成並有固定 JSON keys，但都標為 invalid_evidence_ref：一筆使用方括號 id 與 event，另一筆使用正確 source 加 event。"
+    },
+    {
+      "id": "evidence-smoke-no-semantic-evaluation",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["observation-smoke-evidence-contract-gap"],
+      "artifact_refs": ["artifact-smoke-responses", "artifact-smoke-plan", "artifact-smoke-commit"],
+      "public_summary": "條件 mapping 在 output completion 後才公開，沒有盲評、獨立標註或 aggregate score；機械失敗不能被當成 H1 語義失敗或 B0／I1 比較結果。"
+    },
+    {
+      "id": "evidence-smoke-contract-inputs",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["observation-smoke-evidence-contract-gap"],
+      "artifact_refs": ["artifact-smoke-fixture", "artifact-smoke-prompt-renderer", "artifact-smoke-response-validator"],
+      "public_summary": "固定 fixture 同時含 source、claim、event 與 authority material；renderer 對 evidence_refs 僅要求「提供材料的 id」，而 response validator 僅允許 evidence material kinds。此差異可由固定 revision 重建，但仍只支持檢查契約對齊，不歸因模型能力。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-smoke-observation-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T05:54:20Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 smoke 的 prompt-contract gap 觀察；這筆記錄在輸出公開範圍檢查後建立，不保存私有 runtime 脈絡。",
+      "subject_refs": ["observation-smoke-evidence-contract-gap"]
+    },
+    {
+      "id": "event-smoke-inconclusive",
+      "kind": "verification_recorded",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T05:54:21Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "記錄資源 smoke 為未定論：完成性可觀察，但 evidence-reference gate 失敗且沒有語義評估。",
+      "subject_refs": ["observation-smoke-evidence-contract-gap"],
+      "evidence_refs": ["evidence-smoke-completion-with-contract-failure", "evidence-smoke-no-semantic-evaluation", "evidence-smoke-contract-inputs"],
+      "verification": {
+        "outcome": "inconclusive",
+        "method": "固定一 case、兩 condition、單一本機 Qwen 的 128-token loopback smoke，並檢查 JSON envelope 與 evidence reference 類型。",
+        "scope": "只涵蓋 manifest 所列模型、case digest、設定、兩個 output 與機械 contract。",
+        "limitations": [
+          "沒有語義盲評、獨立標註、完整 matrix 或第二模型重複。",
+          "不推論模型的知識邊界、誠實、人格、意識或 structured context 的效果。"
+        ]
+      }
+    }
+  ]
+}

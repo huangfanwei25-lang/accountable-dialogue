@@ -18,6 +18,7 @@ EVALUATION_CASE_DESIGN_REVISION = "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
 SMALL_MODEL_PILOT_PLAN_REVISION = "790663cf9929e2d3ff28c24d271c477d6a110013"
 SMALL_MODEL_PILOT_HARNESS_REVISION = "625356bad1db84a2627854fe702109437b58d948"
 SMALL_MODEL_PILOT_ATTEMPT_REVISION = "b3dba53b756237bd5bc2dc2a75dc23a1ee1d2df4"
+LOCAL_RESOURCE_SMOKE_REVISION = "2dca34ae9073dd29a7e9913e48644257b2c70ca7"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -171,6 +172,50 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("inconclusive", projection.verification)
         self.assertEqual("event-pilot-attempt-inconclusive", projection.verification_event_id)
+
+    def test_resource_smoke_preserves_contract_failure_without_a_semantic_effect_claim(self) -> None:
+        record = load_record("synthetic-local-resource-smoke-result.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            {
+                "artifact-smoke-status",
+                "artifact-smoke-manifest",
+                "artifact-smoke-responses",
+                "artifact-smoke-plan",
+                "artifact-smoke-fixture",
+                "artifact-smoke-prompt-renderer",
+                "artifact-smoke-response-validator",
+                "artifact-smoke-commit",
+            },
+            set(artifacts),
+        )
+        self.assertTrue(
+            all(artifact["revision"] == LOCAL_RESOURCE_SMOKE_REVISION for artifact in artifacts.values())
+        )
+
+        verification_event = next(event for event in record["events"] if event["id"] == "event-smoke-inconclusive")
+        self.assertEqual("inconclusive", verification_event["verification"]["outcome"])
+        self.assertEqual(
+            [
+                "evidence-smoke-completion-with-contract-failure",
+                "evidence-smoke-no-semantic-evaluation",
+                "evidence-smoke-contract-inputs",
+            ],
+            verification_event["evidence_refs"],
+        )
+        self.assertIn(
+            "不推論模型的知識邊界、誠實、人格、意識或 structured context 的效果。",
+            verification_event["verification"]["limitations"],
+        )
+
+        projection = project_subject(record, "observation-smoke-evidence-contract-gap")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("inconclusive", projection.verification)
+        self.assertEqual("event-smoke-inconclusive", projection.verification_event_id)
 
 
 if __name__ == "__main__":
