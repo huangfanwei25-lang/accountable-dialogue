@@ -15,6 +15,7 @@ SEQUENCE_PROJECTION_REVISION = "7372348aa6372feda6765a21cec7368377852216"
 PROTOCOL_REVISION = "c9d43c52320c90d598e5ad899c51416c091cb880"
 PROTOCOL_REFINEMENT_REVISION = "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
 EVALUATION_CASE_DESIGN_REVISION = "ed8acc6ac1aa6aebb02d775cfe9dffed22bc3845"
+SMALL_MODEL_PILOT_PLAN_REVISION = "790663cf9929e2d3ff28c24d271c477d6a110013"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -122,6 +123,29 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("under_review", projection.governance)
         self.assertEqual("no_implementation_report", projection.implementation)
         self.assertEqual("no_verification_record", projection.verification)
+
+    def test_small_model_pilot_has_a_limited_owner_authorization_but_no_run_claim(self) -> None:
+        record = load_record("synthetic-small-model-pilot-proposal.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            SMALL_MODEL_PILOT_PLAN_REVISION,
+            artifacts["artifact-small-model-pilot-plan"]["revision"],
+        )
+
+        projection = project_subject(record, "proposal-synthetic-small-model-pilot")
+        self.assertEqual("ratified", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("no_verification_record", projection.verification)
+
+        decision = next(event["decision"] for event in record["events"] if event["kind"] == "governance_decided")
+        self.assertEqual("human", decision["made_by"]["kind"])
+        self.assertEqual(
+            ["synthetic_pilot", "local_model_execution"],
+            decision["authority_basis"]["scope"],
+        )
 
 
 if __name__ == "__main__":

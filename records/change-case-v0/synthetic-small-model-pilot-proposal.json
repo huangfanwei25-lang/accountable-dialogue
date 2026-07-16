@@ -1,0 +1,101 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-synthetic-small-model-pilot",
+  "public_summary": "記錄擁有者對六個完全虛構、低風險 B0／I1 小模型 pilot 的有限授權；它不記錄模型結果，也不定案更廣泛的研究或人格主張。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-synthetic-small-model-pilot",
+      "kind": "proposal",
+      "public_summary": "以六個固定合成案例和兩個本機小模型探索 structured context 的可觀察輸出差異，並在模型呼叫前固定材料、設定與停止條件。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-small-model-pilot-plan",
+      "kind": "document",
+      "locator": "docs/plans/synthetic-small-model-pilot-v0.md",
+      "revision": "790663cf9929e2d3ff28c24d271c477d6a110013"
+    },
+    {
+      "id": "artifact-small-model-pilot-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/790663cf9929e2d3ff28c24d271c477d6a110013",
+      "revision": "790663cf9929e2d3ff28c24d271c477d6a110013"
+    },
+    {
+      "id": "artifact-synthetic-protocol-v2",
+      "kind": "document",
+      "locator": "docs/research/synthetic-evaluation-protocol-v0.md",
+      "revision": "eacb0b8b4f872b6e56283eef2de34e682cfa414a"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-small-model-pilot-scope",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "artifact_refs": ["artifact-small-model-pilot-plan", "artifact-synthetic-protocol-v2"],
+      "public_summary": "計畫固定六個合成、可逆案例、同材料 B0／I1、loopback-only provider 與停止條件；這支持 pilot 的可稽核範圍，不支持任何模型效果。"
+    },
+    {
+      "id": "evidence-small-model-pilot-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "artifact_refs": ["artifact-small-model-pilot-plan", "artifact-small-model-pilot-commit"],
+      "public_summary": "尚未建立 fixture、annotation key、runner、run manifest 或模型輸出；授權不涵蓋訓練、私人資料、H4b 讀者研究、公開未審查原始輸出或內在性質結論。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-small-model-pilot-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T05:22:17Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 pilot Proposal 與公開計畫；這筆帳本時間是記錄時間，不聲稱完整保存對話中的決定發生時刻。",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"]
+    },
+    {
+      "id": "event-small-model-pilot-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T05:22:18Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "將六案例、兩本機模型與不公開未審查原始輸出的範圍交由擁有者決定。",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"]
+    },
+    {
+      "id": "event-small-model-pilot-ratified",
+      "kind": "governance_decided",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T05:22:19Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "回溯記錄擁有者對本機、合成、小模型 pilot 的有限授權；不是對更廣研究、模型內在性質或公開結果的定案。",
+      "subject_refs": ["proposal-synthetic-small-model-pilot"],
+      "decision": {
+        "outcome": "ratified",
+        "made_by": {
+          "kind": "human",
+          "role": "repository_owner"
+        },
+        "authority_basis": {
+          "kind": "owner",
+          "scope": ["synthetic_pilot", "local_model_execution"]
+        },
+        "effective_at": "2026-07-16T05:22:19Z"
+      }
+    }
+  ]
+}
