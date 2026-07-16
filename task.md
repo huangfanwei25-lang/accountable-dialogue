@@ -309,3 +309,24 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [ ] If needed, consider only the fixed official Ollama Qwen3 tag after source, digest, local-only and scan checks.
 - [ ] Keep any extra model on a one-packet synthetic probe until its own result is separately accounted for.
 **Success criteria**: convenience never expands the trust or supply-chain boundary silently.
+
+---
+
+## Active Short Board: J0 Host Compatibility Diagnosis v0 (2026-07-16)
+
+> The fixed J0 initial probe completed all three calls without a verdict. Read-only diagnostics correlate
+> those calls with native `llama-server` crashes on Windows 10 build 1903, below Ollama's documented
+> Windows 10 22H2 minimum. This is a host/runtime compatibility candidate, not a model-judge conclusion.
+
+## Phase 1: Preserve the diagnosis without another model call
+
+- [x] Preserve the initial probe as inconclusive before inspecting host state.
+- [x] Confirm loopback catalog endpoints remain available and correlate the three call times with native runner crash events.
+- [x] Check the OS build against the vendor's documented Windows support floor.
+**Success criteria**: the repository distinguishes a host failure candidate from a claim about Qwen, Llama or human judgment.
+
+## Phase 2: Await an external-environment decision
+
+- [ ] Owner chooses a supported host upgrade, a separate supported host, or to stop local model-judge exploration.
+- [ ] Only after that decision, create a new synthetic-only successor plan; never retry the original three calls.
+**Success criteria**: a repository automation does not alter the user's OS, restart services or download models to bypass an unsupported host boundary.

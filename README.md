@@ -35,7 +35,7 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 - [合成評估協議 v0](docs/research/synthetic-evaluation-protocol-v0.md)：在不收集私人對話、不訓練模型的前提下，定義未來如何測試候選行為；仍待審查。
 - [合成評估案件候選格式 v0](docs/design/synthetic-evaluation-case-v0.md)：先把虛構案例、labels 與 run 結果分開；它不是效果、資料集或人格評分。
 - [合成小模型 Pilot v0](docs/plans/synthetic-small-model-pilot-v0.md)：獲授權的 6-case、兩條件、兩個本機小模型探索；其[受限 Schema](schemas/synthetic-evaluation-case-v0.schema.json)、fixtures 與 local-only runner 已建立，結果尚未產生。
-- [J0 小模型 Judge 可行性 v0](docs/plans/j0-small-model-judge-feasibility-v0.md)：把模型當作待校準的輔助工具，而非人類盲評替身；使用獨立的全虛構 packet、隱藏 oracle 與 local-only runner。其[初始 probe](docs/status/j0-judge-calibration-initial-probe-20260716.md)三筆皆為 transport failure，尚無模型 judge 能力結論。
+- [J0 小模型 Judge 可行性 v0](docs/plans/j0-small-model-judge-feasibility-v0.md)：把模型當作待校準的輔助工具，而非人類盲評替身；使用獨立的全虛構 packet、隱藏 oracle 與 local-only runner。其[初始 probe](docs/status/j0-judge-calibration-initial-probe-20260716.md)三筆皆為 transport failure，後續[host 診斷](docs/status/j0-host-compatibility-diagnosis-20260716.md)指向不受支援 Windows build 的 native-runtime 相容性問題；尚無模型 judge 能力結論。
 - [本機資源 Smoke Test v0](docs/plans/synthetic-local-resource-smoke-v0.md)：完整 matrix 因 CPU 資源限制中止後的有界後繼測試；尚未執行。
 - [舊概念整合邊界](docs/research/legacy-concepts-integration.md)：只重寫可公開的設計教訓，不搬入舊記憶、日誌或 runtime。
 - [公開面遷移清單](docs/plans/public-surface-intake-v0.md)：哪些舊素材只取其概念、哪些必須重寫、哪些絕不搬入。
