@@ -229,5 +229,5 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 
 - [x] Verify `qwen2.5:1.5b` remains locally installed, then execute exactly two calls; both passed the then-defined mechanical status but used empty `evidence_refs`.
 - [x] Inspect temporary output and manifest before selecting synthetic-only public Artifacts; all released content is fully fictional and public-safe.
-- [ ] Record a separate v0.2 outcome, including any timeout or contract failure, without a semantic label or B0/I1 effect claim.
+- [x] Record the separate v0.2 outcome as an inconclusive citation-adequacy observation, without a semantic label or B0/I1 effect claim.
 **Success criteria**: v0.2 is attributable to its own response-contract revision and cannot overwrite the v0.1 result.
