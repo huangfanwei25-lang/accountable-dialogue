@@ -16,6 +16,7 @@ from accountable_dialogue.local_pilot import (
 )
 from accountable_dialogue.synthetic_pilot import (
     CASE_FORMAT,
+    RESPONSE_CONTRACT_VERSION,
     RESPONSE_FIELDS,
     annotation_key_digest,
     load_annotation_key,
@@ -130,6 +131,28 @@ class SyntheticPilotTests(unittest.TestCase):
                 self.assertNotIn(label, baseline.prompt)
                 self.assertNotIn(label, structured.prompt)
 
+    def test_response_contract_names_only_exact_evidence_ids(self) -> None:
+        for path in sorted(CASES.glob("*.json")):
+            case = load_case(path.name)
+            baseline = render_condition(case, "B0_baseline")
+            structured = render_condition(case, "I1_structured_context")
+
+            self.assertIn("回覆契約：", baseline.prompt)
+            baseline_contract = baseline.prompt.rsplit("回覆契約：", maxsplit=1)[1]
+            structured_contract = structured.prompt.split("\n\n同一材料的 structured_context：", maxsplit=1)[0]
+            structured_contract = structured_contract.rsplit("回覆契約：", maxsplit=1)[1]
+            self.assertEqual(baseline_contract, structured_contract, path.name)
+            self.assertIn("不加方括號", baseline_contract)
+            self.assertIn("不得放入 claim、event 或 authority_constraint", baseline_contract)
+
+            evidence_ids = [
+                material["id"]
+                for material in case["materials"]
+                if material["kind"] in {"source_excerpt", "test_result", "policy", "role_statement", "audit_record"}
+            ]
+            for evidence_id in evidence_ids:
+                self.assertIn(evidence_id, baseline_contract, path.name)
+
     def test_metamorphic_pairs_change_only_the_declared_evidence(self) -> None:
         incomplete = load_case("h1-incomplete-library-hours.json")
         supported = load_case("h1-supported-library-hours.json")
@@ -211,6 +234,7 @@ class SyntheticPilotTests(unittest.TestCase):
             self.assertNotEqual(output_dir.resolve().parent, ROOT.resolve())
             self.assertEqual({"A", "B"}, {row["condition_alias"] for row in result.rows})
             self.assertTrue(all(row["mechanical_status"] == "valid" for row in result.rows))
+            self.assertEqual(RESPONSE_CONTRACT_VERSION, result.manifest["response_contract_version"])
 
         generation_payloads = [payload for _, url, payload, _ in transport.requests if url.endswith("/api/generate")]
         self.assertEqual(2, len(generation_payloads))
@@ -246,6 +270,48 @@ class SyntheticPilotTests(unittest.TestCase):
             )
 
         self.assertEqual({"invalid_json", "invalid_response_object"}, {row["mechanical_status"] for row in result.rows})
+
+    def test_runner_rejects_bracketed_and_non_evidence_material_ids(self) -> None:
+        case = load_case("h1-incomplete-library-hours.json")
+        responses = [
+            {
+                "response": json.dumps(
+                    {
+                        "conclusion": "僅根據提供材料回答。",
+                        "evidence_refs": ["[source-hours-weekdays]"],
+                        "prior_claim_ref": "not_applicable",
+                        "unknown_or_correction": "not_applicable",
+                        "authority_next_step": "not_applicable",
+                    },
+                    ensure_ascii=False,
+                )
+            },
+            {
+                "response": json.dumps(
+                    {
+                        "conclusion": "僅根據提供材料回答。",
+                        "evidence_refs": ["event-hours-notice"],
+                        "prior_claim_ref": "not_applicable",
+                        "unknown_or_correction": "not_applicable",
+                        "authority_next_step": "not_applicable",
+                    },
+                    ensure_ascii=False,
+                )
+            },
+        ]
+        client = LocalOnlyOllamaClient("http://127.0.0.1:11434", transport=FakeOllamaTransport(responses))
+        config = PilotExecutionConfig(models=("tiny-a:latest",), timeout_seconds=3, max_tokens=80)
+
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            result = execute_pilot(
+                cases=(case,),
+                client=client,
+                config=config,
+                output_dir=Path(temporary_directory) / "pilot-output",
+                repository_root=ROOT,
+            )
+
+        self.assertEqual(["invalid_evidence_ref", "invalid_evidence_ref"], [row["mechanical_status"] for row in result.rows])
 
 
 if __name__ == "__main__":

@@ -21,6 +21,8 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from accountable_dialogue.synthetic_pilot import (
+    EVIDENCE_MATERIAL_KINDS,
+    RESPONSE_CONTRACT_VERSION,
     RESPONSE_FIELDS,
     annotation_key_digest,
     load_annotation_key,
@@ -261,6 +263,7 @@ def execute_pilot(
         },
         "case_digests": {case["case_id"]: _canonical_digest(case) for case in normalized_cases},
         "condition_mapping_sha256": mapping_digest,
+        "response_contract_version": RESPONSE_CONTRACT_VERSION,
         "response_count": len(rows),
         "raw_outputs_publication": "not_reviewed",
     }
@@ -343,7 +346,7 @@ def _mechanical_response_status(raw_response: str, material_ids: Sequence[str], 
     permitted_evidence_ids = {
         material_id
         for material_id in material_ids
-        if material_kinds[material_id] in {"source_excerpt", "test_result", "policy", "role_statement", "audit_record"}
+        if material_kinds[material_id] in EVIDENCE_MATERIAL_KINDS
     }
     if any(reference not in permitted_evidence_ids for reference in evidence_refs):
         return "invalid_evidence_ref"

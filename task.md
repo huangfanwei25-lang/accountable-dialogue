@@ -208,3 +208,26 @@ from the pre-installed `pytest-freezegun` plugin, not from this repository's cod
 - [x] Inspect temporary raw output and manifest before publishing a synthetic-only summary; both responses failed the evidence-reference mechanical gate.
 - [x] Record the outcome as a separate smoke-test case, including the observed contract failure and its limits.
 **Success criteria**: no semantic label or model-effect conclusion is made from a resource smoke test.
+
+---
+
+## Active Short Board: Evidence-reference Contract Smoke v0.2 (2026-07-16)
+
+> The first resource smoke completed its two calls but both failed the evidence-reference
+> mechanical gate. This board fixes that prompt/validator mismatch in a new, traceable
+> successor under the existing bounded local-pilot authorization. It does not rewrite the
+> first run or authorize a semantic-effect claim.
+
+## Phase 1: Fix and freeze the response contract
+
+- [x] Add renderer and fake-transport regression tests for exact evidence ids, bracketed ids and non-evidence ids.
+- [x] Make the response instruction name only permitted evidence ids and write its version into the run manifest.
+- [x] Commit and push this successor plan before a live call.
+**Success criteria**: the model-visible instruction and mechanical validator impose the same evidence-reference boundary.
+
+## Phase 2: Run and account separately
+
+- [ ] Verify `qwen2.5:1.5b` remains locally installed, then execute exactly two calls.
+- [ ] Inspect temporary output and manifest before selecting any synthetic public Artifact.
+- [ ] Record a separate v0.2 outcome, including any timeout or contract failure, without a semantic label or B0/I1 effect claim.
+**Success criteria**: v0.2 is attributable to its own response-contract revision and cannot overwrite the v0.1 result.
