@@ -1,0 +1,156 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-j0-safe-transport-observability-preparation",
+  "public_summary": "此變更帳記錄 J0 transport-observability successor 的準備實作：runner 可保留有限的 timeout、network、HTTP class/status 或 provider-contract category，而不保存 server error text、body、headers、URL 或本機路徑。它沒有開始新的 compatibility probe。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-j0-safe-transport-observability",
+      "kind": "proposal",
+      "public_summary": "為未來已支援 host 上的單一 synthetic successor 準備最小、可公開檢查的 transport failure vocabulary；任何模型 generation 仍取決於 owner 的外部 host 決定。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-j0-safe-transport-plan",
+      "kind": "document",
+      "locator": "docs/plans/j0-transport-observability-successor-v0.md",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    },
+    {
+      "id": "artifact-j0-safe-transport-client",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/local_pilot.py",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    },
+    {
+      "id": "artifact-j0-safe-transport-runner",
+      "kind": "source_file",
+      "locator": "accountable_dialogue/judge_calibration.py",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    },
+    {
+      "id": "artifact-j0-safe-transport-judge-tests",
+      "kind": "test",
+      "locator": "tests/test_judge_calibration.py",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    },
+    {
+      "id": "artifact-j0-safe-transport-client-tests",
+      "kind": "test",
+      "locator": "tests/test_synthetic_pilot.py",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    },
+    {
+      "id": "artifact-j0-host-diagnosis",
+      "kind": "document",
+      "locator": "docs/status/j0-host-compatibility-diagnosis-20260716.md",
+      "revision": "61d3cbd0d1e453d02340e597b01a80c760977171"
+    },
+    {
+      "id": "artifact-j0-safe-transport-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/3f3ad2e55d6080ac9617122e09223bcc4c8072ab",
+      "revision": "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-j0-safe-transport-boundary",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-safe-transport-observability"],
+      "artifact_refs": [
+        "artifact-j0-safe-transport-plan",
+        "artifact-j0-safe-transport-client",
+        "artifact-j0-safe-transport-runner"
+      ],
+      "public_summary": "HTTP failure 在 generic URL error 之前被攔截，只按有限 class 與可選的 100–599 status 分類，並以 transport_observation 輸出而保留既有 mechanical_status 相容性。實作不讀取或序列化 HTTP error body、headers、URL 或 exception text。"
+    },
+    {
+      "id": "evidence-j0-safe-transport-tests",
+      "kind": "test_result",
+      "relation": "supports",
+      "subject_refs": ["proposal-j0-safe-transport-observability"],
+      "artifact_refs": [
+        "artifact-j0-safe-transport-client",
+        "artifact-j0-safe-transport-runner",
+        "artifact-j0-safe-transport-judge-tests",
+        "artifact-j0-safe-transport-client-tests"
+      ],
+      "public_summary": "Mock tests 注入帶有敏感-looking fake path 的 HTTP 400/500 body 與 network、timeout、provider-contract exception。輸出的 observation 只保留允許的 kind/status，不包含這些字串；valid judge JSON 與 provider contract failure 仍維持分離。"
+    },
+    {
+      "id": "evidence-j0-safe-transport-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-j0-safe-transport-observability"],
+      "artifact_refs": [
+        "artifact-j0-safe-transport-plan",
+        "artifact-j0-host-diagnosis",
+        "artifact-j0-safe-transport-commit"
+      ],
+      "public_summary": "目前 Windows 1903 host 仍位於文件支援下限之外。更好的 error accounting 不會解決 native runner crash，也不授權新的 generation、retry、restart、OS update、模型下載或 human-rater substitution。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-j0-safe-transport-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T14:20:00Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "建立 safe transport observability Proposal，將可測的 failure accounting 與尚待的人類 host 決定分開。",
+      "subject_refs": ["proposal-j0-safe-transport-observability"]
+    },
+    {
+      "id": "event-j0-safe-transport-implemented",
+      "kind": "implementation_reported",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T14:20:01Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "已實作 finite safe failure class、HTTP status boundary、runner transport_observation 與 mock regression coverage；沒有觸發 model generation。",
+      "subject_refs": ["proposal-j0-safe-transport-observability"],
+      "implementation": {
+        "outcome": "reported_implemented",
+        "scope": "只擴充 local transport 的安全機械觀測，讓 J0 external result 可區分 timeout、network、HTTP 與 provider-contract stop，而不帶錯誤正文。",
+        "limitations": [
+          "沒有修復或繞過目前 host 的 native runner crash。",
+          "沒有新的 generation、raw model output、Qwen/Llama judge result、H1 human verdict 或模型下載。"
+        ]
+      }
+    },
+    {
+      "id": "event-j0-safe-transport-verified",
+      "kind": "verification_recorded",
+      "sequence": 3,
+      "recorded_at": "2026-07-16T14:20:02Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "本地 mock tests、完整 suite、lint 與 diff check 驗證 transport failure output 的有限資料邊界；不驗證任何 live provider 或模型行為。",
+      "subject_refs": ["proposal-j0-safe-transport-observability"],
+      "evidence_refs": [
+        "evidence-j0-safe-transport-boundary",
+        "evidence-j0-safe-transport-tests",
+        "evidence-j0-safe-transport-limit"
+      ],
+      "verification": {
+        "outcome": "verified_within_scope",
+        "method": "mock HTTP 400/500、network、timeout、provider-contract tests；python -m pytest tests/ -x；python -m ruff check accountable_dialogue tests scripts；git diff --check。",
+        "scope": "驗證 safe transport_observation 只含允許的 kind 與 optional status、沒有敏感-looking fake error data，且 J0 judge verdict contract 的既有 checks 未被改寫。",
+        "limitations": [
+          "沒有新的 generation，因此沒有新的 provider compatibility 或小模型 judge 能力證據。",
+          "目前 host 仍不受支援；後續是否換 host、升級 OS 或停止探索需要人類決定。"
+        ]
+      }
+    }
+  ]
+}

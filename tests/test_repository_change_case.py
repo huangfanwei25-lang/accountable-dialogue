@@ -28,6 +28,7 @@ J0_JUDGE_CALIBRATION_HARNESS_REVISION = "5d006b3dcefb7a089376a1b362e094a26b27e67
 J0_JUDGE_CALIBRATION_LAUNCH_FIX_REVISION = "c41df420f76e667b9bb6437f965a85e1bba4e9ce"
 J0_JUDGE_CALIBRATION_INITIAL_PROBE_REVISION = "13172a431e5339a5ac7a3d030ae819090e940c51"
 J0_HOST_COMPATIBILITY_DIAGNOSIS_REVISION = "61d3cbd0d1e453d02340e597b01a80c760977171"
+J0_SAFE_TRANSPORT_OBSERVABILITY_REVISION = "3f3ad2e55d6080ac9617122e09223bcc4c8072ab"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -418,6 +419,25 @@ class RepositoryChangeCaseTests(unittest.TestCase):
 
         verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
         self.assertTrue(any("不證明唯一 root cause" in item for item in verification["limitations"]))
+
+    def test_j0_safe_transport_preparation_does_not_start_a_successor_probe(self) -> None:
+        record = load_record("j0-safe-transport-observability-preparation.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        artifacts = {artifact["id"]: artifact for artifact in record["artifacts"]}
+        self.assertEqual(
+            J0_SAFE_TRANSPORT_OBSERVABILITY_REVISION,
+            artifacts["artifact-j0-safe-transport-plan"]["revision"],
+        )
+
+        projection = project_subject(record, "proposal-j0-safe-transport-observability")
+        self.assertEqual("no_governance_record", projection.governance)
+        self.assertEqual("reported_implemented", projection.implementation)
+        self.assertEqual("verified_within_scope", projection.verification)
+
+        verification = next(event["verification"] for event in record["events"] if event["kind"] == "verification_recorded")
+        self.assertTrue(any("沒有新的 generation" in item for item in verification["limitations"]))
 
 
 if __name__ == "__main__":
