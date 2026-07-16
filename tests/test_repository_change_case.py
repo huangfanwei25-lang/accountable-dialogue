@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RECORDS = ROOT / "records" / "change-case-v0"
 SCHEMA = ROOT / "schemas" / "change-case-v0.schema.json"
 SEQUENCE_PROJECTION_REVISION = "7372348aa6372feda6765a21cec7368377852216"
+PROTOCOL_REVISION = "c9d43c52320c90d598e5ad899c51416c091cb880"
 
 
 def load_record(name: str) -> dict[str, object]:
@@ -84,6 +85,18 @@ class RepositoryChangeCaseTests(unittest.TestCase):
         self.assertEqual("event-projection-implemented", projection.implementation_event_id)
         self.assertEqual("verified_within_scope", projection.verification)
         self.assertEqual("event-projection-verified", projection.verification_event_id)
+
+    def test_synthetic_protocol_stays_under_review_without_a_runtime_claim(self) -> None:
+        record = load_record("synthetic-evaluation-protocol-proposal.json")
+
+        self.assertEqual([], validate_change_case(record))
+        self.assert_artifacts_are_locatable(record)
+        self.assertTrue(all(artifact["revision"] == PROTOCOL_REVISION for artifact in record["artifacts"]))
+
+        projection = project_subject(record, "proposal-synthetic-evaluation-protocol")
+        self.assertEqual("under_review", projection.governance)
+        self.assertEqual("no_implementation_report", projection.implementation)
+        self.assertEqual("no_verification_record", projection.verification)
 
 
 if __name__ == "__main__":

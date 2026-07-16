@@ -1,0 +1,77 @@
+{
+  "format": "accountable-dialogue/change-case-v0",
+  "case_id": "case-synthetic-evaluation-protocol",
+  "public_summary": "公開 Proposal：為可問責的代理連續性起草低風險合成評估協議；它不是 evaluator、dataset、模型介入或實驗結果。",
+  "visibility": "public",
+  "subjects": [
+    {
+      "id": "proposal-synthetic-evaluation-protocol",
+      "kind": "proposal",
+      "public_summary": "以 B0 baseline 與 I1 structured context 的等價合成案例，定義知識邊界、修正完整性與權限紀律的未來評估條件。"
+    }
+  ],
+  "artifacts": [
+    {
+      "id": "artifact-synthetic-protocol",
+      "kind": "document",
+      "locator": "docs/research/synthetic-evaluation-protocol-v0.md",
+      "revision": "c9d43c52320c90d598e5ad899c51416c091cb880"
+    },
+    {
+      "id": "artifact-continuity-proposal-v1",
+      "kind": "document",
+      "locator": "docs/research/accountable-agent-continuity-v0.md",
+      "revision": "c9d43c52320c90d598e5ad899c51416c091cb880"
+    },
+    {
+      "id": "artifact-protocol-commit",
+      "kind": "external_source",
+      "locator": "https://github.com/huangfanwei25-lang/accountable-dialogue/commit/c9d43c52320c90d598e5ad899c51416c091cb880",
+      "revision": "c9d43c52320c90d598e5ad899c51416c091cb880"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "evidence-protocol-design-coherence",
+      "kind": "artifact_review",
+      "relation": "supports",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol"],
+      "artifact_refs": ["artifact-synthetic-protocol", "artifact-continuity-proposal-v1"],
+      "public_summary": "文件將既有候選假說轉為 B0／I1、公開合成 episode、獨立標註與可列舉失敗條件；這只支持設計連貫性，不支持任何模型效果。"
+    },
+    {
+      "id": "evidence-protocol-limit",
+      "kind": "artifact_review",
+      "relation": "limits",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol"],
+      "artifact_refs": ["artifact-synthetic-protocol", "artifact-protocol-commit"],
+      "public_summary": "尚未決定資料邊界、run-specific preregistration、樣本、threshold、fixture、標註者、模型或成本；沒有 evaluator、模型呼叫、訓練或結果。"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-protocol-created",
+      "kind": "subject_created",
+      "sequence": 1,
+      "recorded_at": "2026-07-16T04:26:53Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "依擁有者要求繼續整理，建立公開且非可執行的研究協議 Proposal。",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol"]
+    },
+    {
+      "id": "event-protocol-review",
+      "kind": "review_requested",
+      "sequence": 2,
+      "recorded_at": "2026-07-16T04:26:54Z",
+      "recorded_by": {
+        "kind": "agent",
+        "role": "assistant"
+      },
+      "public_summary": "等待擁有者審查資料邊界、可接受的 baseline、標註與失敗判準；沒有治理定案或實作報告。",
+      "subject_refs": ["proposal-synthetic-evaluation-protocol"]
+    }
+  ]
+}
