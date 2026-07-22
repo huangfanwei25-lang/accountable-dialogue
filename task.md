@@ -6,6 +6,29 @@
 
 ---
 
+## Active Short Board: Cross-Model Continuity Profile v0 (2026-07-22)
+
+> Owner authorized a bounded public profile for cross-model handoff. It defines public integration
+> boundaries only; it does not authorize private-memory import, runtime integration, identity claims,
+> automated synchronization, or a second public data protocol.
+
+## Phase 1: Define the public profile
+
+- [x] Separate Accountable Dialogue, Private Memory and ToneSoul ownership.
+- [x] Keep `change-case-v0` as this Profile's only cross-repository public JSON exchange contract.
+- [x] Bound public deliberative stance and resource observations without inferring identity or budget.
+
+**Success criteria**: a consumer can distinguish portable public accountability from private continuity and runtime state.
+
+## Phase 2: Add thin model entrypoints
+
+- [x] Add one canonical `AGENTS.md` and thin Claude, Gemini and Copilot routing files.
+- [x] Test that adapters do not route agents to private context or create a parallel protocol.
+
+**Success criteria**: model-specific files converge on the same public boundary without duplicating policy.
+
+---
+
 ## Active Short Board: Clean Public Foundation (2026-07-15)
 
 > Owner requested a clean `main` for Accountable Dialogue. This board creates a
