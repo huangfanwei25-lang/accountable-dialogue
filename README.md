@@ -29,6 +29,7 @@ runtime、訓練系統、資料集、身份服務或持久化帳本。
 
 - [哲學／工程契約](docs/philosophy/engineering-contract.md)：重要改動、權限、撤回、風險與完成聲稱的共同規則。
 - [可觀測性與證據邊界](docs/contracts/observability-and-evidence-boundary.md)：哪些東西可被檢查，哪些仍必須誠實稱為不透明。
+- [跨模型可問責連續性 Profile v0](docs/contracts/cross-model-continuity-profile-v0.md)：三層倉庫責任、公開審議立場、資源觀測與模型接手的最小邊界。
 - [公開邊界](PUBLIC_BOUNDARY.md)：什麼可以進公開倉庫，什麼必須留在受限環境。
 - [研究邊界：可問責的認識論行為](docs/research/behavioral-honesty-research-boundary.md)：若要研究「誠實相關行為」，什麼才是可測的問題。
 - [可問責的代理連續性 v0](docs/research/accountable-agent-continuity-v0.md)：將誠實、記憶、人格與治理拆成可反駁的研究問題，而非一個靈魂或誠實分數。
